@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--my-primary: #ffe5ec;
+		--my-secondary: #ffc2d1;
+		--my-tertiary: #ffb3c6;
+		--my-primary-accent: #ff8fab;
+		--my-secondary-accent: #fb6f92;
+		--my-tertiary-accent: #f94c7c;
+	}
+}
