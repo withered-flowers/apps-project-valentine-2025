@@ -1,10 +1,45 @@
 ---
+import SlotCentered from "@/components/SlotCentered.astro";
 import Layout from "@/layouts/Layout.astro";
-import SlotCentered from "@/layouts/SlotCentered.astro";
+import LottieAnimation from "astro-integration-lottie/Lottie.astro";
 ---
+
+<script>
+  import { actions } from "astro:actions";
+
+  const form = document.querySelector("form");
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const { data, error } = await actions.formHandler(undefined);
+
+    console.log("Data", data);
+    console.log("Error", error);
+  });
+</script>
 
 <Layout title="Hello Valentine">
   <SlotCentered>
-    <h1 class="font-secondary text-3xl text-primary-accent">Welcome to Project Valentine</h1>
+    <!-- Header  -->
+    <div class="flex flex-row gap-4 items-center px-8 md:px-0">
+      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <h1 class="font-secondary text-3xl text-primary-accent text-center">
+        Welcome to Project Valentine
+      </h1>
+      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+    </div>
+    <!-- Content -->
+    <div>
+      <p class="font-secondary text-lg text-primary-accent text-center">
+        This is a project to show my love for Astro and TailwindCSS
+      </p>
+      <form method="post">
+        <button
+          type="submit"
+          class="py-1 px-2 rounded mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary transition-colors duration-300"
+          >Submit
+        </button>
+      </form>
+    </div>
   </SlotCentered>
 </Layout>
