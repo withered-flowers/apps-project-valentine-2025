@@ -7,7 +7,6 @@ const Love = defineTable({
 		}),
 		name: column.text(),
 		significant_other_name: column.text(),
-		language_to_show: column.text(),
 	},
 	indexes: [
 		{
