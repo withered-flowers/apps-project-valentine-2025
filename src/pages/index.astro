@@ -11,10 +11,20 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const { data, error } = await actions.formHandler(undefined);
+
+    const formData = new FormData(form);
+    const { data, error } = await actions.formHandler(formData);
 
     console.log("Data", data);
     console.log("Error", error);
+
+    const response = document.getElementById("response");
+
+    response ? response.innerHTML = `
+      <p class="font-secondary text-lg text-primary-accent text-center">
+        ${data ? `Form submitted successfully: ${data.message}` : "Form submission failed"}
+      </p>
+    `: null;
   });
 </script>
 
@@ -31,7 +41,7 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     <!-- Content -->
     <div>
       <p class="font-secondary text-lg text-primary-accent text-center">
-        This is a project to show my love for Astro and TailwindCSS
+        A website to show your love for your significant other
       </p>
       <form method="post">
         <button
@@ -40,6 +50,7 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
           >Submit
         </button>
       </form>
+      <div id="response"></div>
     </div>
   </SlotCentered>
 </Layout>

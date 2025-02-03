@@ -1,6 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+	--color-primary: var(--my-primary);
+	--color-secondary: var(--my-secondary);
+	--color-tertiary: var(--my-tertiary);
+	--color-primary-accent: var(--my-primary-accent);
+	--color-secondary-accent: var(--my-secondary-accent);
+	--color-tertiary-accent: var(--my-tertiary-accent);
+
+	--font-primary: "Dancing Script Variable", sans-serif;
+	--font-secondary: "Itim", sans-serif;
+	--font-tertiary: "Sunshiney", sans-serif;
+}
 
 @layer base {
 	:root {

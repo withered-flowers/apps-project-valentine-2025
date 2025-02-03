@@ -4,7 +4,7 @@ import { z } from "astro:schema";
 export const server = {
 	formHandler: defineAction({
 		accept: "form",
-		input: z.undefined(),
+		input: z.object({}),
 		handler: async () => {
 			// TODO: Implement save to drizzle turso db
 
