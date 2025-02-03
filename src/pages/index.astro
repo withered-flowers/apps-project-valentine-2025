@@ -5,7 +5,7 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
 ---
 
 <script>
-  import { actions } from "astro:actions";
+  import { actions, isInputError } from "astro:actions";
 
   const form = document.querySelector("form");
 
@@ -13,18 +13,36 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     e.preventDefault();
 
     const formData = new FormData(form);
-    const { data, error } = await actions.formHandler(formData);
+    const input1ErrorField = document.querySelector("#your-name-error") as HTMLDivElement;
+    const input2ErrorField = document.querySelector("#so-name-error") as HTMLDivElement;
+    const response = document.querySelector("#response") as HTMLDivElement;
 
-    console.log("Data", data);
-    console.log("Error", error);
+    // Reset Error Fields
+    input1ErrorField.textContent = "";
+    input2ErrorField.textContent = "";
 
-    const response = document.getElementById("response");
+    const { data, error } = await actions.formHandler({
+      "your-name": formData.get("your-name") as string,
+      "so-name": formData.get("so-name") as string,
+    });
 
-    response ? response.innerHTML = `
-      <p class="font-secondary text-lg text-primary-accent text-center">
-        ${data ? `Form submitted successfully: ${data.message}` : "Form submission failed"}
-      </p>
-    `: null;
+    // Error Handler
+    if (error && isInputError(error)) {
+      if (error.fields["your-name"]) {
+        input1ErrorField.textContent = error.fields["your-name"].join(", ") ?? "";
+      }
+
+      if (error.fields["so-name"]) {
+        input2ErrorField.textContent = error.fields["so-name"].join(", ") ?? "";
+      }
+
+      return;
+    }
+
+    if (!error) {
+      const successMessage = "Congratulations, this is your url: ";
+      response.textContent = successMessage + data.url;
+    }
   });
 </script>
 
@@ -39,18 +57,50 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
     </div>
     <!-- Content -->
-    <div>
+    <div class="spring">
       <p class="font-secondary text-lg text-primary-accent text-center">
         A website to show your love for your significant other
       </p>
-      <form method="post">
+
+      <!-- Form Submission -->
+      <form method="post" class="grid grid-cols-2 items-center gap-1 mt-4">
+        <!-- Input 1 -->
+        <label for="your-name" class="font-secondary text-primary-accent text-base text-center">
+          Enter Name 1
+        </label>
+        <input
+          type="text"
+          placeholder="Your Name"
+          name="your-name"
+          class="py-1 px-2 rounded mx-auto my-2 font-secondary text-tertiary-accent"
+        />
+        <div id="your-name-error" class="col-span-2 text-center font-tertiary text-tertiary-accent">
+        </div>
+        <!-- Input 2 -->
+        <label for="so-name" class="font-secondary text-primary-accent text-base text-center">
+          Enter Name 2
+        </label>
+        <input
+          type="text"
+          placeholder="Significant Other's Name"
+          name="so-name"
+          class="py-1 px-2 rounded mx-auto my-2 font-secondary text-tertiary-accent"
+        />
+        <div
+          id="so-name-error"
+          class="col-span-2 text-center font-tertiary text-tertiary-accent mb-4"
+        >
+        </div>
+        <!-- Submit Button -->
         <button
           type="submit"
-          class="py-1 px-2 rounded mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary transition-colors duration-300"
+          class="py-1 px-2 col-span-2 rounded mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary transition-colors duration-300"
           >Submit
         </button>
       </form>
-      <div id="response"></div>
+
+      <!-- Response Form Submission -->
+      <div id="response" class="my-4 text-center text-secondary-accent font-secondary"></div>
     </div>
   </SlotCentered>
 </Layout>
