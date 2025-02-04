@@ -4,6 +4,71 @@ import Layout from "@/layouts/Layout.astro";
 import LottieAnimation from "astro-integration-lottie/Lottie.astro";
 ---
 
+<style>
+  .form-container {
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards;
+  }
+
+  @keyframes slideUp {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .input-group {
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+
+  .input-group:hover {
+    transform: translateY(-2px);
+  }
+
+  input {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--secondary-accent);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1.02);
+  }
+
+  .submit-btn {
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .spring {
+    animation: springIn 1s ease;
+  }
+
+  @keyframes springIn {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+</style>
+
 <script>
   import { actions, isInputError } from "astro:actions";
 
@@ -13,8 +78,12 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     e.preventDefault();
 
     const formData = new FormData(form);
-    const input1ErrorField = document.querySelector("#your-name-error") as HTMLDivElement;
-    const input2ErrorField = document.querySelector("#so-name-error") as HTMLDivElement;
+    const input1ErrorField = document.querySelector(
+      "#your-name-error"
+    ) as HTMLDivElement;
+    const input2ErrorField = document.querySelector(
+      "#so-name-error"
+    ) as HTMLDivElement;
     const response = document.querySelector("#response") as HTMLDivElement;
 
     // Reset Error Fields
@@ -29,7 +98,8 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     // Error Handler
     if (error && isInputError(error)) {
       if (error.fields["your-name"]) {
-        input1ErrorField.textContent = error.fields["your-name"].join(", ") ?? "";
+        input1ErrorField.textContent =
+          error.fields["your-name"].join(", ") ?? "";
       }
 
       if (error.fields["so-name"]) {
@@ -55,57 +125,87 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
   <SlotCentered>
     <!-- Header  -->
     <div class="flex flex-row gap-4 items-center px-8 md:px-0">
-      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <LottieAnimation
+        class="w-8 h-8 mx-auto"
+        src="assets/lotties/heart.json"
+        autoplay="visible"
+      />
       <h1 class="font-secondary text-3xl text-primary-accent text-center">
         Welcome to Project Valentine
       </h1>
-      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <LottieAnimation
+        class="w-8 h-8 mx-auto"
+        src="assets/lotties/heart.json"
+        autoplay="visible"
+      />
     </div>
     <!-- Content -->
-    <div class="spring">
+    <div class="spring w-full">
       <p class="font-secondary text-lg text-primary-accent text-center">
         A website to show your love for your significant other
       </p>
 
       <!-- Form Submission -->
-      <form method="post" class="grid grid-cols-2 items-center gap-1 mt-4">
+      <form
+        method="post"
+        class="form-container grid grid-cols-2 items-center gap-3 max-w-2xl mx-auto p-6 rounded-lg bg-white/5 backdrop-blur-sm"
+      >
         <!-- Input 1 -->
-        <label for="your-name" class="font-secondary text-primary-accent text-base text-center">
-          Enter Name 1
-        </label>
-        <input
-          type="text"
-          placeholder="Your Name"
-          name="your-name"
-          class="py-1 px-2 rounded mx-auto my-2 font-secondary text-tertiary-accent"
-        />
-        <div id="your-name-error" class="col-span-2 text-center font-tertiary text-tertiary-accent">
+        <div class="input-group col-span-2 md:col-span-1">
+          <label
+            for="your-name"
+            class="font-secondary text-primary-accent text-base text-center block mb-2"
+          >
+            Enter Name 1
+          </label>
+          <input
+            type="text"
+            placeholder="Your Name"
+            name="your-name"
+            class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
+          />
+          <div
+            id="your-name-error"
+            class="mt-2 text-center font-tertiary text-tertiary-accent"
+          >
+          </div>
         </div>
+
         <!-- Input 2 -->
-        <label for="so-name" class="font-secondary text-primary-accent text-base text-center">
-          Enter Name 2
-        </label>
-        <input
-          type="text"
-          placeholder="Significant Other's Name"
-          name="so-name"
-          class="py-1 px-2 rounded mx-auto my-2 font-secondary text-tertiary-accent"
-        />
-        <div
-          id="so-name-error"
-          class="col-span-2 text-center font-tertiary text-tertiary-accent mb-4"
-        >
+        <div class="input-group col-span-2 md:col-span-1">
+          <label
+            for="so-name"
+            class="font-secondary text-primary-accent text-base text-center block mb-2"
+          >
+            Enter Name 2
+          </label>
+          <input
+            type="text"
+            placeholder="Significant Other's Name"
+            name="so-name"
+            class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
+          />
+          <div
+            id="so-name-error"
+            class="mt-2 text-center font-tertiary text-tertiary-accent"
+          >
+          </div>
         </div>
+
         <!-- Submit Button -->
         <button
           type="submit"
-          class="py-1 px-2 col-span-2 rounded mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary transition-colors duration-300"
-          >Submit
+          class="submit-btn py-2 px-6 col-span-2 rounded-lg mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary"
+          >Create Valentine
         </button>
       </form>
 
       <!-- Response Form Submission -->
-      <div id="response" class="my-4 text-center text-secondary-accent font-secondary"></div>
+      <div
+        id="response"
+        class="mb-6 text-center text-secondary-accent font-secondary"
+      >
+      </div>
     </div>
   </SlotCentered>
 </Layout>
