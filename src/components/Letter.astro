@@ -18,12 +18,12 @@ const { name, soName } = Astro.props;
     transform: translateY(0);
   }
 
-  .so-name.visible {
+  .so-name.visible,
+  .sender-name.visible {
     animation: spring 2s ease-in-out forwards;
   }
 
-  .love-message.visible,
-  .sender-name.visible {
+  .love-message.visible {
     animation: spring 2s ease-in-out infinite;
   }
 
@@ -427,7 +427,7 @@ const { name, soName } = Astro.props;
         class="text-lg font-secondary text-primary-accent fade-in sender-name"
         data-name={name}
       >
-        From: {name}
+        From: ♥ <b class="font-primary text-3xl md:text-5xl">{name}</b> ♥
       </p>
     </div>
   </div>

@@ -13,23 +13,23 @@ export const MESSAGE_TO_SHOW = [
     origin_language: "Italian",
   },
   {
-    say: "Te amo",
-    origin_language: "Spanish",
-  },
-  {
     say: "Ich liebe dich",
     origin_language: "German",
+  },
+  {
+    say: "Te amo",
+    origin_language: "Spanish",
   },
   {
     say: "愛してる",
     origin_language: "Japanese",
   },
   {
-    say: "사랑해",
+    say: "사랑해 (Saranghae)",
     origin_language: "Korean",
   },
   {
-    say: "我爱你",
+    say: "我爱你 (wǒ ài nǐ)",
     origin_language: "Chinese (Mandarin)",
   },
   {
