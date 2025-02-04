@@ -152,6 +152,11 @@ const { name, soName } = Astro.props;
     const contentContainer = document.querySelector(".content-container") as HTMLElement;
     const stickyContainer = document.querySelector(".sticky-container") as HTMLElement;
     
+    // Add audio elements
+    const audio = document.getElementById("audio-source") as HTMLAudioElement;
+    const volumeOff = document.getElementById("volume-off");
+    const volumeOn = document.getElementById("volume-on");
+    
     // Existing elements
     const soNameElement = document.querySelector(".so-name") as HTMLElement;
     const loveMessageElement = document.querySelector(".love-message") as HTMLElement;
@@ -160,8 +165,17 @@ const { name, soName } = Astro.props;
     // Disable scroll initially
     document.body.style.overflow = 'hidden';
 
-    envelope.addEventListener("click", () => {
+    envelope.addEventListener("click", async () => {
       envelope.classList.add("opened");
+      // Play audio when envelope is clicked
+      try {
+        await audio.play();
+        volumeOff?.classList.add("hidden");
+        volumeOn?.classList.remove("hidden");
+      } catch (error) {
+        console.log("Audio playback failed:", error);
+      }
+      
       setTimeout(() => {
         envelope.classList.add("hide");
         setTimeout(() => {
