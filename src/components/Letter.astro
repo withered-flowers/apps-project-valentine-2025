@@ -154,6 +154,38 @@ const { name, soName } = Astro.props;
   .sticky-container.visible {
     visibility: visible;
   }
+
+  .scroll-message {
+    position: fixed;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: #fb7185;
+    font-size: 1.2rem;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-message.visible {
+    opacity: 1;
+  }
+
+  @keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-20px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
+
   .love-carousel {
     position: relative;
     overflow: hidden;
@@ -195,6 +227,9 @@ const { name, soName } = Astro.props;
     ) as HTMLElement;
     const stickyContainer = document.querySelector(
       ".sticky-container"
+    ) as HTMLElement;
+    const scrollMessage = document.querySelector(
+      ".scroll-message"
     ) as HTMLElement;
 
     // Add audio elements
@@ -268,6 +303,7 @@ const { name, soName } = Astro.props;
           setTimeout(() => {
             contentContainer.classList.add("visible");
             stickyContainer.classList.add("visible");
+            scrollMessage.classList.add("visible");
           }, 100);
         }, 600);
       }, 1200);
@@ -392,6 +428,8 @@ const { name, soName } = Astro.props;
   <div class="envelope-inner"></div>
   <div class="envelope-flap"></div>
 </div>
+
+<div class="scroll-message">Scroll down ↓</div>
 
 <div class="content-container">
   <div
