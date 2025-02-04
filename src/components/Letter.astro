@@ -1,4 +1,6 @@
 ---
+import { MESSAGE_TO_SHOW } from "@/constant";
+
 const { name, soName } = Astro.props;
 ---
 
@@ -152,6 +154,35 @@ const { name, soName } = Astro.props;
   .sticky-container.visible {
     visibility: visible;
   }
+  .love-carousel {
+    position: relative;
+    overflow: hidden;
+    height: 4rem;
+  }
+
+  .love-message-slide {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+  }
+
+  .love-message-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .love-message-slide.previous {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  .love-language {
+    font-size: 0.875rem;
+    color: #fb7185;
+    font-style: italic;
+  }
 </style>
 
 <script>
@@ -304,6 +335,52 @@ const { name, soName } = Astro.props;
 
     // Initial check in case elements are already in view
     handleScroll();
+
+    const startCarousel = () => {
+      const slides = document.querySelectorAll(".love-message-slide");
+      let currentSlide = 0;
+
+      // Show first slide
+      slides[0].classList.add("active");
+
+      setInterval(() => {
+        // Remove classes from current slide
+        slides[currentSlide].classList.remove("active");
+        slides[currentSlide].classList.add("previous");
+
+        // Move to next slide
+        currentSlide = (currentSlide + 1) % slides.length;
+
+        // Remove previous class from new slide
+        slides[currentSlide].classList.remove("previous");
+        // Add active class to new slide
+        slides[currentSlide].classList.add("active");
+
+        // Clean up previous slide
+        setTimeout(() => {
+          slides.forEach((slide, index) => {
+            if (index !== currentSlide) {
+              slide.classList.remove("previous");
+            }
+          });
+        }, 500);
+      }, 3000); // Change slide every 3 seconds
+    };
+
+    // Start carousel when content becomes visible
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if ((mutation.target as HTMLElement).classList.contains("visible")) {
+          startCarousel();
+          observer.disconnect();
+        }
+      });
+    });
+
+    observer.observe(contentContainer, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
   });
 </script>
 
@@ -323,19 +400,26 @@ const { name, soName } = Astro.props;
     <div class="sticky top-[50%] p-3 -translate-y-[50%]">
       <!-- SO's Name -->
       <p
-        class="text-4xl md:text-6xl font-secondary text-primary-accent fade-in so-name font-bold"
+        class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold"
         data-name={soName}
       >
-        Hello, {soName}
+        Hello, <b class="font-primary text-3xl md:text-5xl">{soName}</b>
       </p>
 
       <!-- I Love You message -->
       <div class="py-16">
-        <p
-          class="text-lg font-secondary text-primary-accent fade-in love-message"
-        >
-          I love you
-        </p>
+        <div class="love-carousel fade-in love-message">
+          {
+            MESSAGE_TO_SHOW.map((message) => (
+              <div class="love-message-slide">
+                <p class="text-2xl font-secondary text-primary-accent">
+                  {message.say}
+                </p>
+                <span class="love-language">{message.origin_language}</span>
+              </div>
+            ))
+          }
+        </div>
       </div>
 
       <!-- Sender's Name -->
