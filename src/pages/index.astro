@@ -40,8 +40,13 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     }
 
     if (!error) {
+      const formTarget = e.target as HTMLFormElement;
+      formTarget.reset();
+
       const successMessage = "Congratulations, this is your url: ";
-      response.textContent = successMessage + data.url;
+      response.innerHTML =
+        successMessage +
+        `<a class="underline font-bold" href=${`/letters/${data.url}`}>/${data.url}</a>`;
     }
   });
 </script>

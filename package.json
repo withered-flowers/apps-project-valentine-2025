@@ -11,8 +11,9 @@
     "astro": "5.2.3",
     "astro-icon": "^1.1.5",
     "astro-integration-lottie": "^0.3.2",
+    "canvas-confetti": "^1.9.3",
     "lottie-web": "^5.12.2",
-    "motion": "^12.0.6",
+    "nanoid": "^5.0.9",
     "tailwindcss": "^4.0.2"
   },
   "scripts": {
@@ -21,5 +22,8 @@
     "preview": "astro preview",
     "astro": "astro"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0"
+  }
 }

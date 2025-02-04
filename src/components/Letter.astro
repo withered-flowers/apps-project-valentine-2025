@@ -1,0 +1,110 @@
+---
+const { name, soName } = Astro.props;
+---
+
+<style>
+  .fade-in {
+    opacity: 0; /* Start invisible */
+    transform: translateY(1rem); /* Start slightly below */
+    transition:
+      opacity 0.5s ease-out,
+      transform 0.5s ease-out; /* Transition for smooth effect */
+  }
+
+  .fade-in.visible {
+    opacity: 1; /* Fully visible */
+    transform: translateY(0); /* Move to original position */
+    transition:
+      opacity 0.5s ease-out,
+      transform 0.5s ease-out; /* Transition for smooth effect */
+  }
+
+  .fade-in.hidden {
+    opacity: 0; /* Fully invisible */
+    transform: translateY(-1rem); /* Move slightly up for fade-out effect */
+    transition:
+      opacity 0.5s ease-out,
+      transform 0.5s ease-out; /* Transition for smooth effect */
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const soNameElement = document.querySelector(".so-name") as HTMLElement;
+    const loveMessageElement = document.querySelector(".love-message") as HTMLElement;
+    const senderNameElement = document.querySelector(".sender-name") as HTMLElement;
+
+    let lastScrollTop = window.scrollY;
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight;
+
+      // Show or hide SO's Name
+      if (scrollPosition > soNameElement.offsetTop) {
+        soNameElement.classList.add("visible");
+      }
+
+      // Show or hide "I love you" message
+      if (scrollPosition > document.body.scrollHeight / 2) {
+        loveMessageElement.classList.add("visible");
+      }
+
+      // Show or hide Sender's Name
+      if (scrollPosition > document.body.scrollHeight - senderNameElement.offsetHeight) {
+        senderNameElement.classList.add("visible");
+      }
+
+      // Detect scroll direction
+      let currentScrollTop = window.scrollY;
+      if (currentScrollTop < lastScrollTop) {
+        // Scrolling up
+        if (scrollPosition < soNameElement.offsetTop) {
+          soNameElement.classList.remove("visible");
+        }
+        if (scrollPosition < document.body.scrollHeight / 2) {
+          loveMessageElement.classList.remove("visible");
+        }
+        if (scrollPosition < document.body.scrollHeight - senderNameElement.offsetHeight) {
+          senderNameElement.classList.remove("visible");
+        }
+      } else {
+        // Scrolling down
+        if (scrollPosition > soNameElement.offsetTop) {
+          soNameElement.classList.add("visible");
+        }
+        if (scrollPosition > document.body.scrollHeight / 2) {
+          loveMessageElement.classList.add("visible");
+        }
+        if (scrollPosition > document.body.scrollHeight - senderNameElement.offsetHeight) {
+          senderNameElement.classList.add("visible");
+        }
+      }
+
+      lastScrollTop = currentScrollTop; // Update last scroll position
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    // Initial check in case elements are already in view
+    handleScroll();
+  });
+</script>
+
+<div class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container">
+  <div class="sticky top-[50%] p-3 -translate-y-[50%]">
+    <!-- SO's Name -->
+    <p class="text-xl font-secondary text-primary-accent fade-in so-name" data-name={soName}>
+      Hello, {soName}
+    </p>
+
+    <!-- I Love You message -->
+    <div class="py-16">
+      <p class="text-lg font-secondary text-primary-accent fade-in love-message">I love you</p>
+    </div>
+
+    <!-- Sender's Name -->
+    <p class="text-lg font-secondary text-primary-accent fade-in sender-name" data-name={name}>
+      From: {name}
+    </p>
+  </div>
+</div>
