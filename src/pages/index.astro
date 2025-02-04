@@ -11,13 +11,6 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     animation: slideUp 0.8s ease forwards;
   }
 
-  @keyframes slideUp {
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
   .input-group {
     position: relative;
     transition: transform 0.3s ease;
@@ -52,6 +45,27 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
 
   .spring {
     animation: springIn 1s ease;
+  }
+
+  .success-message {
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
   @keyframes springIn {
@@ -116,7 +130,9 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       const successMessage = "Congratulations, this is your url: ";
       response.innerHTML =
         successMessage +
-        `<a class="underline font-bold" href=${`/letters/${data.url}`}>/${data.url}</a>`;
+        `<a class="underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300" href=${`/letters/${data.url}`}>/${data.url}</a>`;
+
+      response.classList.add("success-message");
     }
   });
 </script>
@@ -203,7 +219,7 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       <!-- Response Form Submission -->
       <div
         id="response"
-        class="mb-6 text-center text-secondary-accent font-secondary"
+        class="mb-6 text-center text-primary-accent font-tertiary text-2xl"
       >
       </div>
     </div>
