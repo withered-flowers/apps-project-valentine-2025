@@ -157,7 +157,7 @@ const { name, soName } = Astro.props;
 
   .scroll-message {
     position: fixed;
-    bottom: 2rem;
+    bottom: 10rem;
     transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.5s ease;
@@ -312,6 +312,14 @@ const { name, soName } = Astro.props;
     let lastScrollTop = window.scrollY;
 
     const handleScroll = () => {
+      const isAtBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 100;
+
+      if (isAtBottom) {
+        scrollMessage.classList.remove("visible");
+      }
+
       const scrollPosition = window.scrollY + window.innerHeight;
 
       // Show or hide SO's Name
@@ -367,7 +375,7 @@ const { name, soName } = Astro.props;
       lastScrollTop = currentScrollTop; // Update last scroll position
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Initial check in case elements are already in view
     handleScroll();
