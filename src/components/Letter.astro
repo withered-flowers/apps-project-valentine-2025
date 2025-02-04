@@ -14,6 +14,14 @@ const { name, soName } = Astro.props;
   .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  .so-name.visible {
+    animation: spring 2s ease-in-out forwards;
+  }
+
+  .love-message.visible,
+  .sender-name.visible {
     animation: spring 2s ease-in-out infinite;
   }
 
