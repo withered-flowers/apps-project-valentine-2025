@@ -1,13 +1,15 @@
 ---
-import AudioPlayer from "@/components/AudioPlayer.astro";
 import Letter from "@/components/Letter.astro";
 import SlotCentered from "@/components/SlotCentered.astro";
 import Layout from "@/layouts/Layout.astro";
+import AudioPlayer from "@/components/AudioPlayer.astro";
+
+export const prerender = true;
 ---
 
-<Layout title="Hello Valentine">
+<Layout title="Letters - Demo">
   <SlotCentered>
-    <Letter />
+    <Letter name="Demo - Your Name" soName="Demo - Significant Other Name" />
     <AudioPlayer />
   </SlotCentered>
 </Layout>
