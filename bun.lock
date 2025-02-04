@@ -8,7 +8,7 @@
         "@fontsource-variable/dancing-script": "^5.1.1",
         "@fontsource/itim": "^5.1.1",
         "@fontsource/sunshiney": "^5.1.1",
-        "@iconify-json/mdi": "^1.2.2",
+        "@iconify-json/mdi": "^1.2.3",
         "@tailwindcss/vite": "^4.0.2",
         "astro": "5.2.3",
         "astro-icon": "^1.1.5",

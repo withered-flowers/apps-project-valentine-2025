@@ -4,19 +4,35 @@ const { name, soName } = Astro.props;
 
 <style>
   .fade-in {
-    opacity: 0; /* Start invisible */
-    transform: translateY(1rem); /* Start slightly below */
+    opacity: 0;
+    transform: translateY(1rem);
     transition:
       opacity 0.5s ease-out,
-      transform 0.5s ease-out; /* Transition for smooth effect */
+      transform 0.5s ease-out;
   }
 
   .fade-in.visible {
-    opacity: 1; /* Fully visible */
-    transform: translateY(0); /* Move to original position */
-    transition:
-      opacity 0.5s ease-out,
-      transform 0.5s ease-out; /* Transition for smooth effect */
+    opacity: 1;
+    transform: translateY(0);
+    animation: spring 2s ease-in-out infinite;
+  }
+
+  @keyframes spring {
+    0% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+    75% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
   .fade-in.hidden {
@@ -26,13 +42,139 @@ const { name, soName } = Astro.props;
       opacity 0.5s ease-out,
       transform 0.5s ease-out; /* Transition for smooth effect */
   }
+
+  .envelope {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: #FFE4E6;
+    border: 2px solid #FFD1D6;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    perspective: 1000px;
+  }
+
+  .envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 100px solid #FFD1D6;
+    transform-origin: top;
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
+
+  .envelope-letter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: white;
+    transform-origin: center;
+    transition: transform 0.8s ease;
+    z-index: 2;
+  }
+
+  .envelope.opened .envelope-flap {
+    transform: rotateX(180deg);
+  }
+
+  .envelope.opened .envelope-letter {
+    transform: translateY(-120%);
+  }
+
+  .envelope:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  .envelope.hide {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    transition: 
+      transform 0.8s ease,
+      opacity 0.6s ease;
+  }
+
+  .envelope:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  .envelope::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: height 0.3s ease;
+  }
+
+  .envelope:hover::after {
+    height: 10px;
+  }
+
+  .content-container {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  .content-container.show {
+    display: block;
+    opacity: 0;
+  }
+
+  .content-container.show.visible {
+    opacity: 1;
+  }
+
+  .sticky-container {
+    visibility: hidden;
+  }
+
+  .sticky-container.visible {
+    visibility: visible;
+  }
 </style>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const envelope = document.querySelector(".envelope") as HTMLElement;
+    const contentContainer = document.querySelector(".content-container") as HTMLElement;
+    const stickyContainer = document.querySelector(".sticky-container") as HTMLElement;
+    
+    // Existing elements
     const soNameElement = document.querySelector(".so-name") as HTMLElement;
     const loveMessageElement = document.querySelector(".love-message") as HTMLElement;
     const senderNameElement = document.querySelector(".sender-name") as HTMLElement;
+
+    // Disable scroll initially
+    document.body.style.overflow = 'hidden';
+
+    envelope.addEventListener("click", () => {
+      envelope.classList.add("opened");
+      setTimeout(() => {
+        envelope.classList.add("hide");
+        setTimeout(() => {
+          contentContainer.classList.add("show");
+          document.body.style.overflow = 'auto';
+          // Add a small delay before showing the content
+          setTimeout(() => {
+            contentContainer.classList.add("visible");
+            stickyContainer.classList.add("visible");
+          }, 100);
+        }, 600);
+      }, 1200);
+    });
 
     let lastScrollTop = window.scrollY;
 
@@ -50,7 +192,10 @@ const { name, soName } = Astro.props;
       }
 
       // Show or hide Sender's Name
-      if (scrollPosition > document.body.scrollHeight - senderNameElement.offsetHeight) {
+      if (
+        scrollPosition >
+        document.body.scrollHeight - senderNameElement.offsetHeight
+      ) {
         senderNameElement.classList.add("visible");
       }
 
@@ -64,7 +209,10 @@ const { name, soName } = Astro.props;
         if (scrollPosition < document.body.scrollHeight / 2) {
           loveMessageElement.classList.remove("visible");
         }
-        if (scrollPosition < document.body.scrollHeight - senderNameElement.offsetHeight) {
+        if (
+          scrollPosition <
+          document.body.scrollHeight - senderNameElement.offsetHeight
+        ) {
           senderNameElement.classList.remove("visible");
         }
       } else {
@@ -75,7 +223,10 @@ const { name, soName } = Astro.props;
         if (scrollPosition > document.body.scrollHeight / 2) {
           loveMessageElement.classList.add("visible");
         }
-        if (scrollPosition > document.body.scrollHeight - senderNameElement.offsetHeight) {
+        if (
+          scrollPosition >
+          document.body.scrollHeight - senderNameElement.offsetHeight
+        ) {
           senderNameElement.classList.add("visible");
         }
       }
@@ -90,21 +241,42 @@ const { name, soName } = Astro.props;
   });
 </script>
 
-<div class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container">
-  <div class="sticky top-[50%] p-3 -translate-y-[50%]">
-    <!-- SO's Name -->
-    <p class="text-xl font-secondary text-primary-accent fade-in so-name" data-name={soName}>
-      Hello, {soName}
-    </p>
+<div class="envelope">
+  <div class="envelope-body">
+    <div class="envelope-side-flap-left"></div>
+    <div class="envelope-side-flap-right"></div>
+  </div>
+  <div class="envelope-inner"></div>
+  <div class="envelope-flap"></div>
+</div>
 
-    <!-- I Love You message -->
-    <div class="py-16">
-      <p class="text-lg font-secondary text-primary-accent fade-in love-message">I love you</p>
+<div class="content-container">
+  <div class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container">
+    <div class="sticky top-[50%] p-3 -translate-y-[50%]">
+      <!-- SO's Name -->
+      <p
+        class="text-4xl md:text-6xl font-secondary text-primary-accent fade-in so-name font-bold"
+        data-name={soName}
+      >
+        Hello, {soName}
+      </p>
+
+      <!-- I Love You message -->
+      <div class="py-16">
+        <p
+          class="text-lg font-secondary text-primary-accent fade-in love-message"
+        >
+          I love you
+        </p>
+      </div>
+
+      <!-- Sender's Name -->
+      <p
+        class="text-lg font-secondary text-primary-accent fade-in sender-name"
+        data-name={name}
+      >
+        From: {name}
+      </p>
     </div>
-
-    <!-- Sender's Name -->
-    <p class="text-lg font-secondary text-primary-accent fade-in sender-name" data-name={name}>
-      From: {name}
-    </p>
   </div>
 </div>

@@ -1,0 +1,45 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<button
+  class="fixed z-90 bottom-[5vh] left-[94vw] bg-primary-accent w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-standard-tertiary text-4xl hover:bg-standard-primary/90 hover:animate-pulse duration-300"
+  id="audio-button"
+  aria-label="Play music"
+>
+  <Icon id="volume-off" name="mdi:volume-off" class="text-white" />
+  <Icon id="volume-on" name="mdi:volume" class="hidden text-white" />
+</button>
+
+<audio id="audio-source">
+  <source src="/music.mp3" type="audio/mpeg" />
+</audio>
+
+<script>
+  const audio = document.getElementById("audio-source") as HTMLAudioElement;
+  const button = document.getElementById("audio-button") as HTMLButtonElement;
+
+  const audioPlayPause = async () => {
+    try {
+      if (audio.paused) {
+        await audio.play();
+        document.getElementById("volume-off")?.classList.add("hidden");
+        document.getElementById("volume-on")?.classList.remove("hidden");
+      } else {
+        audio.pause();
+        document.getElementById("volume-off")?.classList.remove("hidden");
+        document.getElementById("volume-on")?.classList.add("hidden");
+      }
+    } catch (error) {
+      console.log("Audio playback failed:", error);
+    }
+  };
+
+  const audioReset = () => {
+    audio.currentTime = 0;
+    audio.play();
+  };
+
+  audio.addEventListener("ended", audioReset);
+  button.addEventListener("click", audioPlayPause);
+</script>
