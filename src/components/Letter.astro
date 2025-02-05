@@ -1,6 +1,7 @@
 ---
 import { MESSAGE_TO_SHOW } from "@/constant";
 
+const { id } = Astro.params;
 const { name, soName, isAnswered } = Astro.props;
 ---
 
@@ -232,6 +233,8 @@ const { name, soName, isAnswered } = Astro.props;
     border-radius: 9999px;
     font-weight: 600;
     transition: all 0.3s ease;
+    min-width: 4rem;
+    width: 10rem;
   }
 
   .yes-button {
@@ -273,6 +276,7 @@ const { name, soName, isAnswered } = Astro.props;
 </style>
 
 <script>
+  import { actions } from "astro:actions";
   import confetti from "canvas-confetti";
 
   // DOM Elements
@@ -291,6 +295,9 @@ const { name, soName, isAnswered } = Astro.props;
     audio: document.getElementById("audio-source") as HTMLAudioElement,
     volumeOff: document.getElementById("volume-off"),
     volumeOn: document.getElementById("volume-on"),
+    formMaybe: document.getElementById("form-maybe"),
+    formYes: document.getElementById("form-yes"),
+    loveContainer: document.getElementById("love-container"),
   };
 
   // Utility Functions
@@ -436,6 +443,17 @@ const { name, soName, isAnswered } = Astro.props;
     }, 1200);
   };
 
+  const handleFormSubmit = async (theAnswer: boolean) => {
+    const slug = elements.contentContainer.getAttribute("data-slug") ?? "demo";
+
+    await actions.formAcceptanceHandler({
+      slug,
+      the_answer: theAnswer,
+    });
+
+    console.log("Now it's answered");
+  };
+
   // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     // Initial setup
@@ -443,6 +461,14 @@ const { name, soName, isAnswered } = Astro.props;
 
     // Event listeners
     elements.envelope.addEventListener("click", handleEnvelopeClick);
+    elements.formYes?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      handleFormSubmit(true);
+    });
+    elements.formMaybe?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      handleFormSubmit(false);
+    });
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Start carousel when content becomes visible
@@ -475,7 +501,11 @@ const { name, soName, isAnswered } = Astro.props;
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
 
-<div class="content-container md:w-1/2 w-full">
+<div
+  class="content-container md:w-1/2 w-full"
+  data-slug={id}
+  data-is-answered={isAnswered}
+>
   <div
     class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container"
   >
@@ -498,7 +528,7 @@ const { name, soName, isAnswered } = Astro.props;
       </p>
 
       <!-- I Love You message -->
-      <div class="my-16">
+      <div class="my-16" id="love-container">
         <div class="love-carousel fade-in love-message">
           {
             MESSAGE_TO_SHOW.map((message) => (
@@ -520,10 +550,10 @@ const { name, soName, isAnswered } = Astro.props;
         {
           !isAnswered && (
             <div class="choice-buttons">
-              <form>
+              <form method="post" id="form-yes">
                 <button class="choice-button yes-button">Yes</button>
               </form>
-              <form>
+              <form method="post" id="form-maybe">
                 <button class="choice-button maybe-button">Maybe</button>
               </form>
             </div>

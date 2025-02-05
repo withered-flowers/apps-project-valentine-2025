@@ -1,5 +1,5 @@
 import { defineAction } from "astro:actions";
-import { Love, db } from "astro:db";
+import { Love, db, eq } from "astro:db";
 import { z } from "astro:schema";
 import { createSlug } from "@/utils/slug";
 
@@ -28,6 +28,28 @@ export const server = {
 
 			return {
 				url: `${result[0].slug}`,
+			};
+		},
+	}),
+	formAcceptanceHandler: defineAction({
+		accept: "json",
+		input: z.object({
+			slug: z.string().min(1),
+			the_answer: z.boolean(),
+		}),
+		handler: async (input) => {
+			const result = await db
+				.update(Love)
+				.set({
+					the_answer: input.the_answer ? "1" : "0",
+				})
+				.where(eq(Love.slug, input.slug))
+				.returning({
+					slug: Love.slug,
+				});
+
+			return {
+				result: input.slug === result[0].slug,
 			};
 		},
 	}),

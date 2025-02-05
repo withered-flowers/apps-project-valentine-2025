@@ -1,0 +1,19 @@
+---
+import AudioPlayer from "@/components/AudioPlayer.astro";
+import Letter from "@/components/Letter.astro";
+import SlotCentered from "@/components/SlotCentered.astro";
+import Layout from "@/layouts/Layout.astro";
+
+export const prerender = true;
+---
+
+<Layout title="Letters - Demo - Reply">
+  <SlotCentered>
+    <Letter
+      name="<Your Name>"
+      soName="<Significant Other Name>"
+      isAnswered={true}
+    />
+    <AudioPlayer />
+  </SlotCentered>
+</Layout>

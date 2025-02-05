@@ -1,0 +1,113 @@
+---
+
+---
+
+<style>
+  /* Envelope Styles */
+  .envelope {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: #ffe4e6;
+    border: 2px solid #ffd1d6;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    perspective: 1000px;
+  }
+
+  .envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 100px solid #ffd1d6;
+    transform-origin: top;
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
+
+  .envelope-letter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: white;
+    transform-origin: center;
+    transition: transform 0.8s ease;
+    z-index: 2;
+  }
+
+  .envelope::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: height 0.3s ease;
+  }
+
+  /* Envelope States */
+  .envelope.opened .envelope-flap {
+    transform: rotateX(180deg);
+  }
+
+  .envelope.opened .envelope-letter {
+    transform: translateY(-120%);
+  }
+
+  .envelope:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  .envelope:hover::after {
+    height: 10px;
+  }
+
+  .envelope.hide {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    transition:
+      transform 0.8s ease,
+      opacity 0.6s ease;
+  }
+
+  /* Open Text */
+  .open-text {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fb7185;
+    font-size: 1.2rem;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .open-text.hide {
+    opacity: 0;
+  }
+</style>
+
+<script></script>
+
+<div class="envelope">
+  <div class="envelope-body">
+    <div class="envelope-side-flap-left"></div>
+    <div class="envelope-side-flap-right"></div>
+  </div>
+  <div class="envelope-inner"></div>
+  <div class="envelope-flap"></div>
+</div>
+
+<div class="open-text font-primary">open this ↑</div>
+
+<div class="scroll-message font-primary">Scroll down ↓</div>
