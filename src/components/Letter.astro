@@ -189,7 +189,7 @@ const { name, soName } = Astro.props;
   .love-carousel {
     position: relative;
     overflow: hidden;
-    height: 4rem;
+    height: 8rem;
   }
 
   .love-message-slide {
@@ -439,7 +439,7 @@ const { name, soName } = Astro.props;
 
 <div class="scroll-message">Scroll down ↓</div>
 
-<div class="content-container">
+<div class="content-container md:w-1/2 w-full">
   <div
     class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container"
   >
@@ -449,7 +449,16 @@ const { name, soName } = Astro.props;
         class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold"
         data-name={soName}
       >
-        Hello, <b class="font-primary text-3xl md:text-5xl">{soName}</b>
+        Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{soName}</b> ♥
+      </p>
+
+      <!-- Sender's Name -->
+      <p
+        class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name"
+        data-name={name}
+      >
+        <b class="font-primary text-3xl md:text-5xl mr-1">{name}</b> just wanna ask
+        ...
       </p>
 
       <!-- I Love You message -->
@@ -461,20 +470,17 @@ const { name, soName } = Astro.props;
                 <p class="text-2xl font-secondary text-primary-accent">
                   {message.say}
                 </p>
-                <span class="love-language">{message.origin_language}</span>
+                <p class="text-primary-accent">
+                  {message.pronounciation
+                    ? `(${message.pronounciation})`
+                    : null}
+                </p>
+                <p class="love-language">{message.origin_language}</p>
               </div>
             ))
           }
         </div>
       </div>
-
-      <!-- Sender's Name -->
-      <p
-        class="text-lg font-secondary text-primary-accent fade-in sender-name"
-        data-name={name}
-      >
-        From: ♥ <b class="font-primary text-3xl md:text-5xl">{name}</b> ♥
-      </p>
     </div>
   </div>
 </div>
