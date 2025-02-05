@@ -298,6 +298,8 @@ const { name, soName, isAnswered } = Astro.props;
     formMaybe: document.getElementById("form-maybe"),
     formYes: document.getElementById("form-yes"),
     loveContainer: document.getElementById("love-container"),
+    choiceForm: document.getElementsByClassName("choice-form"),
+    choiceStatement: document.getElementsByClassName("choice-statement"),
   };
 
   // Utility Functions
@@ -416,6 +418,22 @@ const { name, soName, isAnswered } = Astro.props;
     lastScrollTop = currentScrollTop;
   };
 
+  // Initialize Function
+  const initQuestionOrAnswer = () => {
+    const isAnsweredYet =
+      elements.contentContainer.getAttribute("data-is-answered");
+
+    if (isAnsweredYet !== "true") {
+      elements.choiceForm.item(0)?.classList.remove("hidden");
+      elements.choiceForm.item(1)?.classList.remove("hidden");
+      elements.choiceStatement.item(0)?.classList.add("hidden");
+    } else {
+      elements.choiceForm.item(0)?.classList.add("hidden");
+      elements.choiceForm.item(1)?.classList.add("hidden");
+      elements.choiceStatement.item(0)?.classList.remove("hidden");
+    }
+  };
+
   // Event Handlers
   const handleEnvelopeClick = async () => {
     elements.envelope.classList.add("opened");
@@ -446,18 +464,32 @@ const { name, soName, isAnswered } = Astro.props;
   const handleFormSubmit = async (theAnswer: boolean) => {
     const slug = elements.contentContainer.getAttribute("data-slug") ?? "demo";
 
-    await actions.formAcceptanceHandler({
-      slug,
-      the_answer: theAnswer,
-    });
+    if (slug !== "demo" && slug.length > 0) {
+      const { data, error } = await actions.formAcceptanceHandler({
+        slug,
+        the_answer: theAnswer,
+      });
 
-    console.log("Now it's answered");
+      if (!error) {
+        elements.contentContainer.setAttribute(
+          "data-is-answered",
+          String(data.result)
+        );
+
+        initQuestionOrAnswer();
+      }
+
+      return;
+    }
+
+    console.log("Uh oh, it's not triggered");
   };
 
   // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     // Initial setup
     document.body.style.overflow = "hidden";
+    initQuestionOrAnswer();
 
     // Event listeners
     elements.envelope.addEventListener("click", handleEnvelopeClick);
@@ -547,28 +579,17 @@ const { name, soName, isAnswered } = Astro.props;
           }
         </div>
 
-        {
-          !isAnswered && (
-            <div class="choice-buttons">
-              <form method="post" id="form-yes">
-                <button class="choice-button yes-button">Yes</button>
-              </form>
-              <form method="post" id="form-maybe">
-                <button class="choice-button maybe-button">Maybe</button>
-              </form>
-            </div>
-          )
-        }
-
-        {
-          isAnswered && (
-            <div class="choice-buttons">
-              <p class="font-primary text-xl text-primary-accent">
-                ~ You already answered the questions ~
-              </p>
-            </div>
-          )
-        }
+        <div class="choice-buttons">
+          <form class="choice-form" method="post" id="form-yes">
+            <button class="choice-button yes-button">Yes</button>
+          </form>
+          <form class="choice-form" method="post" id="form-maybe">
+            <button class="choice-button maybe-button">Maybe</button>
+          </form>
+          <p class="choice-statement font-primary text-xl text-primary-accent">
+            ~ You already answered the questions ~
+          </p>
+        </div>
       </div>
     </div>
   </div>
