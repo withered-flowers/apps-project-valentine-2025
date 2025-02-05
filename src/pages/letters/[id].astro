@@ -1,10 +1,10 @@
 ---
 import { Love, db, eq } from "astro:db";
+import AudioPlayer from "@/components/AudioPlayer.astro";
 import ErrorLetter from "@/components/ErrorLetter.astro";
 import Letter from "@/components/Letter.astro";
 import SlotCentered from "@/components/SlotCentered.astro";
 import Layout from "@/layouts/Layout.astro";
-import AudioPlayer from "@/components/AudioPlayer.astro";
 
 export const prerender = false;
 
@@ -30,7 +30,11 @@ if (!love || love.length === 0) {
         <ErrorLetter />
       ) : (
         <>
-          <Letter name={love[0].name} soName={love[0].significant_other_name} />
+          <Letter
+            name={love[0].name}
+            soName={love[0].significant_other_name}
+            isAnswered={love[0].the_answer !== null}
+          />
           <AudioPlayer />
         </>
       )

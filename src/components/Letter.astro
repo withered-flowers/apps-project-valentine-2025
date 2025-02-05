@@ -1,7 +1,7 @@
 ---
 import { MESSAGE_TO_SHOW } from "@/constant";
 
-const { name, soName } = Astro.props;
+const { name, soName, isAnswered } = Astro.props;
 ---
 
 <style>
@@ -384,7 +384,7 @@ const { name, soName } = Astro.props;
         document.body.scrollHeight - elements.loveMessage.offsetHeight
       ) {
         elements.loveMessage.classList.remove("visible");
-        elements.choiceButtons.classList.remove("visible");
+        elements.choiceButtons?.classList.remove("visible");
       }
     } else {
       // Scrolling down
@@ -400,9 +400,9 @@ const { name, soName } = Astro.props;
       ) {
         createLoveShower();
         elements.loveMessage.classList.add("visible");
-        elements.choiceButtons.classList.add("visible");
+        elements.choiceButtons?.classList.add("visible");
       } else {
-        elements.choiceButtons.classList.remove("visible");
+        elements.choiceButtons?.classList.remove("visible");
       }
     }
 
@@ -517,11 +517,28 @@ const { name, soName } = Astro.props;
           }
         </div>
 
-        <!-- Add the choice buttons -->
-        <div class="choice-buttons">
-          <button class="choice-button yes-button">Yes</button>
-          <button class="choice-button maybe-button">Maybe</button>
-        </div>
+        {
+          !isAnswered && (
+            <div class="choice-buttons">
+              <form>
+                <button class="choice-button yes-button">Yes</button>
+              </form>
+              <form>
+                <button class="choice-button maybe-button">Maybe</button>
+              </form>
+            </div>
+          )
+        }
+
+        {
+          isAnswered && (
+            <div class="choice-buttons">
+              <p class="font-primary text-xl text-primary-accent">
+                ~ You already answered the questions ~
+              </p>
+            </div>
+          )
+        }
       </div>
     </div>
   </div>
