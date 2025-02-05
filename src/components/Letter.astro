@@ -248,6 +248,21 @@ const { name, soName } = Astro.props;
     background-color: #fff1f2;
     transform: scale(1.05);
   }
+
+  .open-text {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fb7185;
+    font-size: 1.2rem;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .open-text.hide {
+    opacity: 0;
+  }
 </style>
 
 <script>
@@ -264,6 +279,7 @@ const { name, soName } = Astro.props;
     const scrollMessage = document.querySelector(
       ".scroll-message"
     ) as HTMLElement;
+    const openText = document.querySelector(".open-text") as HTMLElement;
 
     // Add audio elements
     const audio = document.getElementById("audio-source") as HTMLAudioElement;
@@ -323,8 +339,7 @@ const { name, soName } = Astro.props;
 
     envelope.addEventListener("click", async () => {
       envelope.classList.add("opened");
-      // // Create love shower effect
-      // createLoveShower();
+      openText.classList.add("hide");
 
       // Play audio when envelope is clicked
       try {
@@ -463,7 +478,9 @@ const { name, soName } = Astro.props;
   <div class="envelope-flap"></div>
 </div>
 
-<div class="scroll-message">Scroll down ↓</div>
+<div class="open-text font-primary">open this ↑</div>
+
+<div class="scroll-message font-primary">Scroll down ↓</div>
 
 <div class="content-container md:w-1/2 w-full">
   <div
