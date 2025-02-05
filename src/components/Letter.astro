@@ -45,14 +45,6 @@ const { name, soName } = Astro.props;
     }
   }
 
-  .fade-in.hidden {
-    opacity: 0; /* Fully invisible */
-    transform: translateY(-1rem); /* Move slightly up for fade-out effect */
-    transition:
-      opacity 0.5s ease-out,
-      transform 0.5s ease-out; /* Transition for smooth effect */
-  }
-
   .envelope {
     position: fixed;
     top: 50%;
@@ -250,7 +242,7 @@ const { name, soName } = Astro.props;
     document.body.style.overflow = "hidden";
 
     const createLoveShower = () => {
-      const duration = 15 * 1000;
+      const duration = 5 * 1000;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
       const animationEnd = Date.now() + duration;
       const loveShape = confetti.shapeFromPath({
@@ -282,8 +274,8 @@ const { name, soName } = Astro.props;
 
     envelope.addEventListener("click", async () => {
       envelope.classList.add("opened");
-      // Create love shower effect
-      createLoveShower();
+      // // Create love shower effect
+      // createLoveShower();
 
       // Play audio when envelope is clicked
       try {
@@ -324,6 +316,7 @@ const { name, soName } = Astro.props;
 
       // Detect scroll direction
       let currentScrollTop = window.scrollY;
+
       if (currentScrollTop < lastScrollTop) {
         // Scrolling up
         if (scrollPosition < soNameElement.offsetTop) {
@@ -350,6 +343,7 @@ const { name, soName } = Astro.props;
           scrollPosition >
           document.body.scrollHeight - loveMessageElement.offsetHeight
         ) {
+          createLoveShower();
           loveMessageElement.classList.add("visible");
         }
       }
@@ -358,9 +352,6 @@ const { name, soName } = Astro.props;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Initial check in case elements are already in view
-    handleScroll();
 
     const startCarousel = () => {
       const slides = document.querySelectorAll(".love-message-slide");
@@ -428,7 +419,7 @@ const { name, soName } = Astro.props;
     <div class="sticky top-[50%] p-3 -translate-y-[50%]">
       <!-- SO's Name -->
       <p
-        class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold"
+        class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold visible"
         data-name={soName}
       >
         Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{soName}</b> ♥
@@ -436,7 +427,7 @@ const { name, soName } = Astro.props;
 
       <!-- Sender's Name -->
       <p
-        class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name"
+        class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
         data-name={name}
       >
         <b class="font-primary text-3xl md:text-5xl mr-1">{name}</b> just wanna ask
@@ -444,7 +435,7 @@ const { name, soName } = Astro.props;
       </p>
 
       <!-- I Love You message -->
-      <div class="py-16">
+      <div class="my-16">
         <div class="love-carousel fade-in love-message">
           {
             MESSAGE_TO_SHOW.map((message) => (
