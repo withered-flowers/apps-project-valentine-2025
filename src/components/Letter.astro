@@ -322,24 +322,6 @@ const { name, soName } = Astro.props;
 
       const scrollPosition = window.scrollY + window.innerHeight;
 
-      // Show or hide SO's Name
-      if (scrollPosition > soNameElement.offsetTop) {
-        soNameElement.classList.add("visible");
-      }
-
-      // Show or hide "I love you" message
-      if (scrollPosition > document.body.scrollHeight / 2) {
-        loveMessageElement.classList.add("visible");
-      }
-
-      // Show or hide Sender's Name
-      if (
-        scrollPosition >
-        document.body.scrollHeight - senderNameElement.offsetHeight
-      ) {
-        senderNameElement.classList.add("visible");
-      }
-
       // Detect scroll direction
       let currentScrollTop = window.scrollY;
       if (currentScrollTop < lastScrollTop) {
@@ -348,13 +330,13 @@ const { name, soName } = Astro.props;
           soNameElement.classList.remove("visible");
         }
         if (scrollPosition < document.body.scrollHeight / 2) {
-          loveMessageElement.classList.remove("visible");
+          senderNameElement.classList.remove("visible");
         }
         if (
           scrollPosition <
-          document.body.scrollHeight - senderNameElement.offsetHeight
+          document.body.scrollHeight - loveMessageElement.offsetHeight
         ) {
-          senderNameElement.classList.remove("visible");
+          loveMessageElement.classList.remove("visible");
         }
       } else {
         // Scrolling down
@@ -362,13 +344,13 @@ const { name, soName } = Astro.props;
           soNameElement.classList.add("visible");
         }
         if (scrollPosition > document.body.scrollHeight / 2) {
-          loveMessageElement.classList.add("visible");
+          senderNameElement.classList.add("visible");
         }
         if (
           scrollPosition >
-          document.body.scrollHeight - senderNameElement.offsetHeight
+          document.body.scrollHeight - loveMessageElement.offsetHeight
         ) {
-          senderNameElement.classList.add("visible");
+          loveMessageElement.classList.add("visible");
         }
       }
 
