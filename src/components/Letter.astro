@@ -228,6 +228,37 @@ const { name, soName, isAnswered } = Astro.props;
     transition: opacity 3s ease-out;
   }
 
+  /* Add new animation for form submission */
+  @keyframes fadeOutUp {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .choice-form.animating-out {
+    animation: fadeOutUp 0.5s ease forwards;
+  }
+
+  .choice-statement.animating-in {
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
   .choice-button {
     padding: 0.75rem 2rem;
     border-radius: 9999px;
@@ -464,6 +495,13 @@ const { name, soName, isAnswered } = Astro.props;
   const handleFormSubmit = async (theAnswer: boolean) => {
     const slug = elements.contentContainer.getAttribute("data-slug") ?? "demo";
 
+    // Add animation before form submission
+    elements.choiceForm.item(0)?.classList.add("animating-out");
+    elements.choiceForm.item(1)?.classList.add("animating-out");
+
+    // Wait for animation to complete
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     if (slug !== "demo" && slug.length > 0) {
       const { data, error } = await actions.formAcceptanceHandler({
         slug,
@@ -476,7 +514,10 @@ const { name, soName, isAnswered } = Astro.props;
           String(data.result)
         );
 
-        initQuestionOrAnswer();
+        elements.choiceForm.item(0)?.classList.add("hidden");
+        elements.choiceForm.item(1)?.classList.add("hidden");
+        elements.choiceStatement.item(0)?.classList.remove("hidden");
+        elements.choiceStatement.item(0)?.classList.add("animating-in");
       }
 
       return;
