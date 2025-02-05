@@ -207,6 +207,46 @@ const { name, soName } = Astro.props;
     color: #fb7185;
     font-style: italic;
   }
+
+  .choice-buttons {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .choice-buttons.visible {
+    opacity: 1;
+  }
+
+  .choice-button {
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .yes-button {
+    background-color: #fb7185;
+    color: white;
+  }
+
+  .yes-button:hover {
+    background-color: #f43f5e;
+    transform: scale(1.05);
+  }
+
+  .maybe-button {
+    background-color: white;
+    color: #fb7185;
+    border: 2px solid #fb7185;
+  }
+
+  .maybe-button:hover {
+    background-color: #fff1f2;
+    transform: scale(1.05);
+  }
 </style>
 
 <script>
@@ -236,6 +276,9 @@ const { name, soName } = Astro.props;
     ) as HTMLElement;
     const senderNameElement = document.querySelector(
       ".sender-name"
+    ) as HTMLElement;
+    const choiceButtons = document.querySelector(
+      ".choice-buttons"
     ) as HTMLElement;
 
     // Disable scroll initially
@@ -330,6 +373,7 @@ const { name, soName } = Astro.props;
           document.body.scrollHeight - loveMessageElement.offsetHeight
         ) {
           loveMessageElement.classList.remove("visible");
+          choiceButtons.classList.remove("visible");
         }
       } else {
         // Scrolling down
@@ -345,6 +389,9 @@ const { name, soName } = Astro.props;
         ) {
           createLoveShower();
           loveMessageElement.classList.add("visible");
+          choiceButtons.classList.add("visible");
+        } else {
+          choiceButtons.classList.remove("visible");
         }
       }
 
@@ -452,6 +499,12 @@ const { name, soName } = Astro.props;
               </div>
             ))
           }
+        </div>
+
+        <!-- Add the choice buttons -->
+        <div class="choice-buttons">
+          <button class="choice-button yes-button">Yes</button>
+          <button class="choice-button maybe-button">Maybe</button>
         </div>
       </div>
     </div>
