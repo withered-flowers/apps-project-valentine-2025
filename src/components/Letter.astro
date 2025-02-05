@@ -458,10 +458,12 @@ const { name, soName, isAnswered } = Astro.props;
       elements.choiceForm.item(0)?.classList.remove("hidden");
       elements.choiceForm.item(1)?.classList.remove("hidden");
       elements.choiceStatement.item(0)?.classList.add("hidden");
+      elements.choiceStatement.item(1)?.classList.add("hidden");
     } else {
       elements.choiceForm.item(0)?.classList.add("hidden");
       elements.choiceForm.item(1)?.classList.add("hidden");
       elements.choiceStatement.item(0)?.classList.remove("hidden");
+      elements.choiceStatement.item(1)?.classList.remove("hidden");
     }
   };
 
@@ -500,7 +502,7 @@ const { name, soName, isAnswered } = Astro.props;
     elements.choiceForm.item(1)?.classList.add("animating-out");
 
     // Wait for animation to complete
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (slug !== "demo" && slug.length > 0) {
       const { data, error } = await actions.formAcceptanceHandler({
@@ -517,7 +519,9 @@ const { name, soName, isAnswered } = Astro.props;
         elements.choiceForm.item(0)?.classList.add("hidden");
         elements.choiceForm.item(1)?.classList.add("hidden");
         elements.choiceStatement.item(0)?.classList.remove("hidden");
+        elements.choiceStatement.item(1)?.classList.remove("hidden");
         elements.choiceStatement.item(0)?.classList.add("animating-in");
+        elements.choiceStatement.item(1)?.classList.add("animating-in");
       }
 
       return;
@@ -627,9 +631,22 @@ const { name, soName, isAnswered } = Astro.props;
           <form class="choice-form" method="post" id="form-maybe">
             <button class="choice-button maybe-button">Maybe</button>
           </form>
-          <p class="choice-statement font-primary text-xl text-primary-accent">
-            ~ You already answered the questions ~
-          </p>
+          <div class="flex flex-col gap-2">
+            <p
+              class="choice-statement font-primary text-xl text-primary-accent"
+            >
+              ~ Thanks for answering the questions ~
+            </p>
+            <p
+              class="choice-statement font-secondary text-base text-primary-accent"
+            >
+              This is the url for the reply letter:
+              <a
+                class="font-primary text-xl text-primary-accent"
+                href={`/letters/${id}/reply`}>hello</a
+              >
+            </p>
+          </div>
         </div>
       </div>
     </div>

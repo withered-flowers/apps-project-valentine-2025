@@ -95,9 +95,73 @@
   .open-text.hide {
     opacity: 0;
   }
+
+  .scroll-message {
+    position: fixed;
+    bottom: 10rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: #fb7185;
+    font-size: 1.2rem;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-message.visible {
+    opacity: 1;
+  }
 </style>
 
-<script></script>
+<script>
+  import { actions } from "astro:actions";
+  import confetti from "canvas-confetti";
+
+  // DOM Elements
+  const elements = {
+    envelope: document.querySelector(".envelope") as HTMLElement,
+    openText: document.querySelector(".open-text") as HTMLElement,
+    scrollMessage: document.querySelector(".scroll-message") as HTMLElement,
+  };
+
+  // Event Handlers
+  const handleEnvelopeClick = async () => {
+    elements.envelope.classList.add("opened");
+    elements.openText.classList.add("hide");
+
+    // Play Audio Player
+    // try {
+    //   await elements.audio.play();
+    //   elements.volumeOff?.classList.add("hidden");
+    //   elements.volumeOn?.classList.remove("hidden");
+    // } catch (error) {
+    //   console.log("Audio playback failed:", error);
+    // }
+
+    setTimeout(() => {
+      elements.envelope.classList.add("hide");
+      setTimeout(() => {
+        // Show Content Container
+        // elements.contentContainer.classList.add("show");
+
+        document.body.style.overflow = "auto";
+
+        setTimeout(() => {
+          // Show Content Container
+          // elements.contentContainer.classList.add("visible");
+          // Show Sticky Container
+          // elements.stickyContainer.classList.add("visible");
+          // Show Scroll Message
+          elements.scrollMessage.classList.add("visible");
+        }, 100);
+      }, 600);
+    }, 1200);
+  };
+
+  // Initialize
+  document.addEventListener("DOMContentLoaded", function () {
+    elements.envelope.addEventListener("click", handleEnvelopeClick);
+  });
+</script>
 
 <div class="envelope">
   <div class="envelope-body">
@@ -108,6 +172,6 @@
   <div class="envelope-flap"></div>
 </div>
 
-<div class="open-text font-primary">open this ↑</div>
+<div class="open-text font-primary">open this reply letter ↑</div>
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
