@@ -14,6 +14,7 @@
     "canvas-confetti": "^1.9.3",
     "lottie-web": "^5.12.2",
     "nanoid": "^5.0.9",
+    "nanostores": "^0.11.3",
     "tailwindcss": "^4.0.2"
   },
   "scripts": {

@@ -633,7 +633,7 @@ const { name, soName, isAnswered } = Astro.props;
           </form>
           <div class="flex flex-col gap-2">
             <p
-              class="choice-statement font-primary text-xl text-primary-accent"
+              class="choice-statement font-tertiary text-xl text-primary-accent"
             >
               ~ Thanks for answering the questions ~
             </p>
@@ -642,8 +642,8 @@ const { name, soName, isAnswered } = Astro.props;
             >
               This is the url for the reply letter:
               <a
-                class="font-primary text-xl text-primary-accent"
-                href={`/letters/${id}/reply`}>hello</a
+                class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
+                href={`/letters/${id}/reply`}>Reply URL</a
               >
             </p>
           </div>

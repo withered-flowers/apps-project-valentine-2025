@@ -1,0 +1,22 @@
+---
+const { soName } = Astro.props;
+---
+
+<div class="text-center">
+  <h1 class="text-3xl font-secondary text-primary-accent">
+    💌 No Reply Message Found 💌
+  </h1>
+  <p class="text-lg font-secondary text-primary-accent">
+    Please wait for <b class="text-3xl font-primary">{soName}&apos;s</b
+    >&nbsp;Reply
+  </p>
+  <p class="text-lg font-secondary text-primary-accent">
+    When the reply is ready, you will be able to read it here.
+  </p>
+  <a
+    href="/"
+    class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
+  >
+    Go back to the home page</a
+  >
+</div>

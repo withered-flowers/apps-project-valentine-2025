@@ -1,8 +1,29 @@
 ---
+import { NO_REPLY_TO_SHOW, YES_REPLY_TO_SHOW } from "@/constant";
 
+const { soName, name, theAnswer } = Astro.props;
 ---
 
 <style>
+  /* Base Animations */
+  @keyframes spring {
+    0% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+    75% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
   /* Envelope Styles */
   .envelope {
     position: fixed;
@@ -110,44 +131,177 @@
   .scroll-message.visible {
     opacity: 1;
   }
+
+  /* Content Container Styles */
+  .content-container {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  .content-container.show {
+    display: block;
+    opacity: 0;
+  }
+
+  .content-container.show.visible {
+    opacity: 1;
+  }
+
+  /* Animation Classess */
+  .so-name.visible,
+  .sender-name.visible {
+    animation: spring 2s ease-in-out forwards;
+  }
+
+  .love-message.visible {
+    animation: spring 2s ease-in-out infinite;
+  }
+
+  /* Love Carousel */
+  .love-carousel {
+    position: relative;
+    overflow: hidden;
+    height: 8rem;
+  }
+
+  .love-message-slide {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+  }
+
+  .love-message-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .love-message-slide.previous {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  .love-language {
+    font-size: 0.875rem;
+    color: #fb7185;
+    font-style: italic;
+  }
 </style>
 
 <script>
-  import { actions } from "astro:actions";
   import confetti from "canvas-confetti";
+  import { isHidden } from "@/stores/audio-button-state";
 
   // DOM Elements
   const elements = {
+    // Envelope Elements
     envelope: document.querySelector(".envelope") as HTMLElement,
     openText: document.querySelector(".open-text") as HTMLElement,
     scrollMessage: document.querySelector(".scroll-message") as HTMLElement,
+    // Content Elements
+    contentContainer: document.querySelector(
+      ".content-container"
+    ) as HTMLElement,
+    soName: document.querySelector(".so-name") as HTMLElement,
+    senderName: document.querySelector(".sender-name") as HTMLElement,
+    loveMessage: document.querySelector(".love-message") as HTMLElement,
+  };
+
+  // Variables
+  let lastScrollTop = window.scrollY;
+
+  // Carousel Functions
+  const startCarousel = () => {
+    const slides = document.querySelectorAll(".love-message-slide");
+    let currentSlide = 0;
+
+    slides[0].classList.add("active");
+
+    setInterval(() => {
+      slides[currentSlide].classList.remove("active");
+      slides[currentSlide].classList.add("previous");
+
+      currentSlide = (currentSlide + 1) % slides.length;
+
+      slides[currentSlide].classList.remove("previous");
+      slides[currentSlide].classList.add("active");
+
+      setTimeout(() => {
+        slides.forEach((slide, index) => {
+          if (index !== currentSlide) {
+            slide.classList.remove("previous");
+          }
+        });
+      }, 500);
+    }, 3000);
+  };
+
+  // Scroll Handler
+  const handleScroll = () => {
+    const isAtBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 100;
+
+    if (isAtBottom) {
+      elements.scrollMessage.classList.remove("visible");
+    }
+
+    const scrollPosition = window.scrollY + window.innerHeight;
+    const currentScrollTop = window.scrollY;
+
+    if (currentScrollTop < lastScrollTop) {
+      // Scrolling up
+      if (scrollPosition < elements.soName.offsetTop) {
+        elements.soName.classList.remove("visible");
+      }
+      if (scrollPosition < document.body.scrollHeight / 2) {
+        elements.senderName.classList.remove("visible");
+      }
+      if (
+        scrollPosition <
+        document.body.scrollHeight - elements.loveMessage.offsetHeight
+      ) {
+        elements.loveMessage.classList.remove("visible");
+      }
+    } else {
+      // Scrolling down
+      if (scrollPosition > elements.soName.offsetTop) {
+        elements.soName.classList.add("visible");
+      }
+      if (scrollPosition > document.body.scrollHeight / 2) {
+        elements.senderName.classList.add("visible");
+      }
+      if (
+        scrollPosition >
+        document.body.scrollHeight - elements.loveMessage.offsetHeight
+      ) {
+        elements.loveMessage.classList.add("visible");
+      }
+    }
+
+    lastScrollTop = currentScrollTop;
   };
 
   // Event Handlers
   const handleEnvelopeClick = async () => {
+    isHidden.set(false);
+
     elements.envelope.classList.add("opened");
     elements.openText.classList.add("hide");
-
-    // Play Audio Player
-    // try {
-    //   await elements.audio.play();
-    //   elements.volumeOff?.classList.add("hidden");
-    //   elements.volumeOn?.classList.remove("hidden");
-    // } catch (error) {
-    //   console.log("Audio playback failed:", error);
-    // }
 
     setTimeout(() => {
       elements.envelope.classList.add("hide");
       setTimeout(() => {
         // Show Content Container
-        // elements.contentContainer.classList.add("show");
+        elements.contentContainer.classList.add("show");
 
         document.body.style.overflow = "auto";
 
         setTimeout(() => {
           // Show Content Container
-          // elements.contentContainer.classList.add("visible");
+          elements.contentContainer.classList.add("visible");
           // Show Sticky Container
           // elements.stickyContainer.classList.add("visible");
           // Show Scroll Message
@@ -160,6 +314,22 @@
   // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     elements.envelope.addEventListener("click", handleEnvelopeClick);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Start carousel when content becomes visible
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if ((mutation.target as HTMLElement).classList.contains("visible")) {
+          startCarousel();
+          observer.disconnect();
+        }
+      });
+    });
+
+    observer.observe(elements.contentContainer, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
   });
 </script>
 
@@ -175,3 +345,71 @@
 <div class="open-text font-primary">open this reply letter ↑</div>
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
+
+<!-- <div class="reply-answer text-center">
+  <h1 class="text-3xl font-secondary text-primary-accent">Reply Letter</h1>
+  <p class="text-lg font-secondary text-primary-accent">
+    <b class="font-primary text-2xl">{soName}</b>&nbsp;says:
+  </p>
+  <p class="text-lg font-primary text-primary-accent">
+    I'm willing to become your valentine! 💖
+  </p>
+</div> -->
+
+<div class="content-container md:w-1/2 w-full">
+  <div
+    class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container"
+  >
+    <div class="sticky top-[50%] p-3 -translate-y-[50%]">
+      <!-- Sender's Name -->
+      <p
+        class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold visible"
+      >
+        Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{name}</b> ♥
+      </p>
+
+      <!-- SO's Name -->
+      <p
+        class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
+      >
+        <b class="font-primary text-3xl md:text-5xl mr-1">{soName}</b>&nbsp;is
+        replying your mail with ...
+      </p>
+
+      <!-- YES_NO Reply message -->
+      <div class="my-16" id="love-container">
+        <div class="love-carousel fade-in love-message">
+          {
+            theAnswer === "1"
+              ? YES_REPLY_TO_SHOW.map((message) => (
+                  <div class="love-message-slide">
+                    <p class="text-2xl font-secondary text-primary-accent">
+                      {message.say}
+                    </p>
+                    <p class="text-primary-accent">
+                      {message.pronounciation
+                        ? `(${message.pronounciation})`
+                        : null}
+                    </p>
+                    <p class="love-language">{message.origin_language}</p>
+                  </div>
+                ))
+              : NO_REPLY_TO_SHOW.map((message) => (
+                  <div class="love-message-slide">
+                    <p class="text-2xl font-secondary text-primary-accent">
+                      {message.say}
+                    </p>
+                    <p class="text-primary-accent">
+                      {message.pronounciation
+                        ? `(${message.pronounciation})`
+                        : null}
+                    </p>
+                    <p class="love-language">{message.origin_language}</p>
+                  </div>
+                ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
