@@ -163,6 +163,12 @@ const { soName, name, theAnswer } = Astro.props;
     position: relative;
     overflow: hidden;
     height: 8rem;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .love-carousel.visible {
+    opacity: 1;
   }
 
   .love-message-slide {
@@ -188,6 +194,15 @@ const { soName, name, theAnswer } = Astro.props;
     color: #fb7185;
     font-style: italic;
   }
+
+  .sender-name {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .sender-name.visible {
+    opacity: 1;
+  }
 </style>
 
 <script>
@@ -207,16 +222,25 @@ const { soName, name, theAnswer } = Astro.props;
     soName: document.querySelector(".so-name") as HTMLElement,
     senderName: document.querySelector(".sender-name") as HTMLElement,
     loveMessage: document.querySelector(".love-message") as HTMLElement,
+    loveCarousel: document.querySelector(".love-carousel") as HTMLElement,
   };
 
   // Variables
-  let lastScrollTop = window.scrollY;
+  let carouselStarted = false;
 
   // Carousel Functions
   const startCarousel = () => {
+    if (carouselStarted) return;
+
     const slides = document.querySelectorAll(".love-message-slide");
     let currentSlide = 0;
 
+    // Only start the carousel when it's visible
+    if (!elements.loveCarousel.classList.contains("visible")) {
+      return;
+    }
+
+    carouselStarted = true;
     slides[0].classList.add("active");
 
     setInterval(() => {
@@ -246,42 +270,37 @@ const { soName, name, theAnswer } = Astro.props;
 
     if (isAtBottom) {
       elements.scrollMessage.classList.remove("visible");
+      elements.loveCarousel.classList.add("visible");
+      startCarousel();
+    } else {
+      elements.loveCarousel.classList.remove("visible");
     }
 
     const scrollPosition = window.scrollY + window.innerHeight;
-    const currentScrollTop = window.scrollY;
+    const viewportHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollPercentage =
+      (window.scrollY / (documentHeight - viewportHeight)) * 100;
 
-    if (currentScrollTop < lastScrollTop) {
-      // Scrolling up
-      if (scrollPosition < elements.soName.offsetTop) {
-        elements.soName.classList.remove("visible");
-      }
-      if (scrollPosition < document.body.scrollHeight / 2) {
-        elements.senderName.classList.remove("visible");
-      }
-      if (
-        scrollPosition <
-        document.body.scrollHeight - elements.loveMessage.offsetHeight
-      ) {
-        elements.loveMessage.classList.remove("visible");
-      }
+    // Show SO name when scroll is around 33% of the total scrollable height
+    if (scrollPercentage >= 33) {
+      elements.senderName.classList.add("visible");
+      elements.senderName.style.opacity = "1";
     } else {
-      // Scrolling down
-      if (scrollPosition > elements.soName.offsetTop) {
-        elements.soName.classList.add("visible");
-      }
-      if (scrollPosition > document.body.scrollHeight / 2) {
-        elements.senderName.classList.add("visible");
-      }
-      if (
-        scrollPosition >
-        document.body.scrollHeight - elements.loveMessage.offsetHeight
-      ) {
-        elements.loveMessage.classList.add("visible");
-      }
+      elements.senderName.classList.remove("visible");
+      elements.senderName.style.opacity = "0";
     }
 
-    lastScrollTop = currentScrollTop;
+    // Update other animations based on scroll position
+    if (scrollPosition > elements.soName.offsetTop) {
+      elements.soName.classList.add("visible");
+    }
+    if (
+      scrollPosition >
+      document.body.scrollHeight - elements.loveMessage.offsetHeight
+    ) {
+      elements.loveMessage.classList.add("visible");
+    }
   };
 
   // Event Handlers
@@ -316,12 +335,16 @@ const { soName, name, theAnswer } = Astro.props;
     elements.envelope.addEventListener("click", handleEnvelopeClick);
     window.addEventListener("scroll", handleScroll, { passive: true });
 
-    // Start carousel when content becomes visible
+    // Single observer for content container
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if ((mutation.target as HTMLElement).classList.contains("visible")) {
-          startCarousel();
+          // Remove the observer since we only need it once
           observer.disconnect();
+
+          // Instead of starting carousel immediately, we'll wait for scroll
+          // The handleScroll function will handle starting the carousel
+          // when the user scrolls to the bottom
         }
       });
     });
@@ -378,7 +401,7 @@ const { soName, name, theAnswer } = Astro.props;
 
       <!-- YES_NO Reply message -->
       <div class="my-16" id="love-container">
-        <div class="love-carousel fade-in love-message">
+        <div class="love-carousel">
           {
             theAnswer === "1"
               ? YES_REPLY_TO_SHOW.map((message) => (
