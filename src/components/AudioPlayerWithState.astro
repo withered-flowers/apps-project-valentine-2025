@@ -1,5 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
+
+const { theAnswer } = Astro.props;
 ---
 
 <style>
@@ -22,7 +24,10 @@ import { Icon } from "astro-icon/components";
 </button>
 
 <audio id="audio-source">
-  <source src="/music.mp3" type="audio/mpeg" />
+  <source
+    src={theAnswer === "1" ? "/accept.mp3" : "/reject.mp3"}
+    type="audio/mpeg"
+  />
 </audio>
 
 <script>
@@ -61,7 +66,7 @@ import { Icon } from "astro-icon/components";
   // Initial Setup
   document.addEventListener("DOMContentLoaded", function () {
     // Subscribe to Store
-    isHidden.subscribe((val) => {
+    isHidden.subscribe((val: boolean) => {
       if (val) {
         console.log("this will pause the audio");
         elements.audio.pause();

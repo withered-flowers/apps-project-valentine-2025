@@ -336,7 +336,6 @@ const { name, soName, isAnswered } = Astro.props;
 
   // Utility Functions
   const createLoveShower = () => {
-    const duration = 5 * 1000;
     const defaults = {
       startVelocity: 30,
       spread: 360,
@@ -352,15 +351,9 @@ const { name, soName, isAnswered } = Astro.props;
       return Math.random() * (max - min) + min;
     }
 
-    const animationEnd = Date.now() + duration;
-    const interval = setInterval(function () {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
-      const particleCount = 10 * (timeLeft / duration);
+    // Create an infinite interval
+    setInterval(function () {
+      const particleCount = 10;
 
       confetti({
         ...defaults,
@@ -400,6 +393,8 @@ const { name, soName, isAnswered } = Astro.props;
 
   // Scroll Handler
   let lastScrollTop = window.scrollY;
+  let hasReachedBottom = false;
+
   const handleScroll = () => {
     const isAtBottom =
       window.innerHeight + window.scrollY >=
@@ -420,13 +415,6 @@ const { name, soName, isAnswered } = Astro.props;
       if (scrollPosition < document.body.scrollHeight / 2) {
         elements.senderName.classList.remove("visible");
       }
-      if (
-        scrollPosition <
-        document.body.scrollHeight - elements.loveMessage.offsetHeight
-      ) {
-        elements.loveMessage.classList.remove("visible");
-        elements.choiceButtons?.classList.remove("visible");
-      }
     } else {
       // Scrolling down
       if (scrollPosition > elements.soName.offsetTop) {
@@ -439,11 +427,12 @@ const { name, soName, isAnswered } = Astro.props;
         scrollPosition >
         document.body.scrollHeight - elements.loveMessage.offsetHeight
       ) {
-        createLoveShower();
+        if (!hasReachedBottom) {
+          createLoveShower();
+          hasReachedBottom = true;
+        }
         elements.loveMessage.classList.add("visible");
         elements.choiceButtons?.classList.add("visible");
-      } else {
-        elements.choiceButtons?.classList.remove("visible");
       }
     }
 

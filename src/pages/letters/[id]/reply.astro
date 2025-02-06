@@ -41,7 +41,7 @@ if (!love || love.length === 0) {
             soName={love[0].significant_other_name}
             theAnswer={love[0].the_answer}
           />
-          <AudioPlayerWithState />
+          <AudioPlayerWithState theAnswer={love[0].the_answer} />
         </>
       )
     }
