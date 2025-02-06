@@ -575,7 +575,9 @@ const { name, soName, isAnswered } = Astro.props;
   <div class="envelope-flap"></div>
 </div>
 
-<div class="open-text font-primary">open this ↑</div>
+<div class="open-text font-primary">
+  Hey <b class="text-3xl">{soName}</b>, open this ↑
+</div>
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
 
@@ -640,10 +642,10 @@ const { name, soName, isAnswered } = Astro.props;
               <p
                 class="choice-statement font-secondary text-base text-primary-accent"
               >
-                This is the url for the reply letter:
+                Here&apos;s {soName}&apos;s reply ♥<br />
                 <a
                   class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
-                  href={`/letters/${id}/reply`}>Reply URL</a
+                  href={`/letters/${id}/reply`}>{soName}&apos;s Reply Letter</a
                 >
               </p>
             </div>
