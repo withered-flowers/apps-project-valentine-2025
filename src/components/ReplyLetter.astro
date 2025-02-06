@@ -263,6 +263,36 @@ const { soName, name, theAnswer } = Astro.props;
     }, 3000);
   };
 
+  const createLoveShower = () => {
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 150,
+      zIndex: 0,
+    };
+
+    const loveShape = confetti.shapeFromPath({
+      path: `m12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53z`,
+    });
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Create an infinite interval
+    setInterval(function () {
+      const particleCount = 10;
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+        colors: ["#ff0000", "#ff69b4", "#ff1493", "#ff007f"],
+        shapes: [loveShape],
+      });
+    }, 250);
+  };
+
   // Modified Scroll Handler
   const handleScroll = () => {
     const isAtBottom =
@@ -277,6 +307,12 @@ const { soName, name, theAnswer } = Astro.props;
       startCarousel();
       // Set isHidden to false when carousel is shown
       isHidden.set(false);
+
+      // Only create love shower if theAnswer is "1"
+      const theAnswer = elements.contentContainer.getAttribute("data-answer");
+      if (theAnswer === "1") {
+        createLoveShower();
+      }
     }
 
     const scrollPosition = window.scrollY + window.innerHeight;
@@ -372,7 +408,7 @@ const { soName, name, theAnswer } = Astro.props;
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
 
-<div class="content-container md:w-1/2 w-full">
+<div class="content-container md:w-1/2 w-full" data-answer={theAnswer}>
   <div class="h-[300vh] relative scroll-smooth sticky-container">
     <div class="sticky top-0 h-screen flex items-center justify-center">
       <div class="w-full text-center p-10">
