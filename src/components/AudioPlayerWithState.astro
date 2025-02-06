@@ -25,7 +25,9 @@ const { theAnswer } = Astro.props;
 
 <audio id="audio-source">
   <source
-    src={theAnswer === "1" ? "/accept.mp3" : "/reject.mp3"}
+    src={theAnswer === "1"
+      ? "/assets/musics/accept.mp3"
+      : "/assets/musics/reject.mp3"}
     type="audio/mpeg"
   />
 </audio>
