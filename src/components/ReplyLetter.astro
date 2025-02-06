@@ -272,8 +272,12 @@ const { soName, name, theAnswer } = Astro.props;
       elements.scrollMessage.classList.remove("visible");
       elements.loveCarousel.classList.add("visible");
       startCarousel();
+      // Set isHidden to false when carousel is shown
+      isHidden.set(false);
     } else {
       elements.loveCarousel.classList.remove("visible");
+      // Set isHidden to true when carousel is not visible
+      isHidden.set(true);
     }
 
     const scrollPosition = window.scrollY + window.innerHeight;
@@ -305,8 +309,6 @@ const { soName, name, theAnswer } = Astro.props;
 
   // Event Handlers
   const handleEnvelopeClick = async () => {
-    isHidden.set(false);
-
     elements.envelope.classList.add("opened");
     elements.openText.classList.add("hide");
 
@@ -368,16 +370,6 @@ const { soName, name, theAnswer } = Astro.props;
 <div class="open-text font-primary">open this reply letter ↑</div>
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
-
-<!-- <div class="reply-answer text-center">
-  <h1 class="text-3xl font-secondary text-primary-accent">Reply Letter</h1>
-  <p class="text-lg font-secondary text-primary-accent">
-    <b class="font-primary text-2xl">{soName}</b>&nbsp;says:
-  </p>
-  <p class="text-lg font-primary text-primary-accent">
-    I'm willing to become your valentine! 💖
-  </p>
-</div> -->
 
 <div class="content-container md:w-1/2 w-full">
   <div
