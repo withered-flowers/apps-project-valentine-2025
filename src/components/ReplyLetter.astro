@@ -372,57 +372,57 @@ const { soName, name, theAnswer } = Astro.props;
 <div class="scroll-message font-primary">Scroll down ↓</div>
 
 <div class="content-container md:w-1/2 w-full">
-  <div
-    class="h-[300vh] relative text-center p-10 scroll-smooth sticky-container"
-  >
-    <div class="sticky top-[50%] p-3 -translate-y-[50%]">
-      <!-- Sender's Name -->
-      <p
-        class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold visible"
-      >
-        Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{name}</b> ♥
-      </p>
+  <div class="h-[300vh] relative scroll-smooth sticky-container">
+    <div class="sticky top-0 h-screen flex items-center justify-center">
+      <div class="w-full text-center p-10">
+        <!-- Sender's Name -->
+        <p
+          class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold visible"
+        >
+          Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{name}</b> ♥
+        </p>
 
-      <!-- SO's Name -->
-      <p
-        class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
-      >
-        <b class="font-primary text-3xl md:text-5xl mr-1">{soName}</b>&nbsp;is
-        replying your mail with ...
-      </p>
+        <!-- SO's Name -->
+        <p
+          class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
+        >
+          <b class="font-primary text-3xl md:text-5xl mr-1">{soName}</b>&nbsp;is
+          replying your mail with ...
+        </p>
 
-      <!-- YES_NO Reply message -->
-      <div class="my-16" id="love-container">
-        <div class="love-carousel">
-          {
-            theAnswer === "1"
-              ? YES_REPLY_TO_SHOW.map((message) => (
-                  <div class="love-message-slide">
-                    <p class="text-2xl font-secondary text-primary-accent">
-                      {message.say}
-                    </p>
-                    <p class="text-primary-accent">
-                      {message.pronounciation
-                        ? `(${message.pronounciation})`
-                        : null}
-                    </p>
-                    <p class="love-language">{message.origin_language}</p>
-                  </div>
-                ))
-              : NO_REPLY_TO_SHOW.map((message) => (
-                  <div class="love-message-slide">
-                    <p class="text-2xl font-secondary text-primary-accent">
-                      {message.say}
-                    </p>
-                    <p class="text-primary-accent">
-                      {message.pronounciation
-                        ? `(${message.pronounciation})`
-                        : null}
-                    </p>
-                    <p class="love-language">{message.origin_language}</p>
-                  </div>
-                ))
-          }
+        <!-- YES_NO Reply message -->
+        <div class="my-16" id="love-container">
+          <div class="love-carousel">
+            {
+              theAnswer === "1"
+                ? YES_REPLY_TO_SHOW.map((message) => (
+                    <div class="love-message-slide">
+                      <p class="text-2xl font-secondary text-primary-accent">
+                        {message.say}
+                      </p>
+                      <p class="text-primary-accent">
+                        {message.pronounciation
+                          ? `(${message.pronounciation})`
+                          : null}
+                      </p>
+                      <p class="love-language">{message.origin_language}</p>
+                    </div>
+                  ))
+                : NO_REPLY_TO_SHOW.map((message) => (
+                    <div class="love-message-slide">
+                      <p class="text-2xl font-secondary text-primary-accent">
+                        {message.say}
+                      </p>
+                      <p class="text-primary-accent">
+                        {message.pronounciation
+                          ? `(${message.pronounciation})`
+                          : null}
+                      </p>
+                      <p class="love-language">{message.origin_language}</p>
+                    </div>
+                  ))
+            }
+          </div>
         </div>
       </div>
     </div>

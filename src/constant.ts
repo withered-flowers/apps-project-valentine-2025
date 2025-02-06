@@ -1,4 +1,5 @@
-export const GITHUB_REPO_URL = "https://github.com/withered-flowers/";
+export const GITHUB_REPO_URL =
+	"https://github.com/withered-flowers/apps-project-valentine-2025";
 
 export const MESSAGE_TO_SHOW = [
 	{
