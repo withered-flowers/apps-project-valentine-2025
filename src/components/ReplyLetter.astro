@@ -227,6 +227,7 @@ const { soName, name, theAnswer } = Astro.props;
 
   // Variables
   let carouselStarted = false;
+  let hasReachedBottom = false;
 
   // Carousel Functions
   const startCarousel = () => {
@@ -262,22 +263,20 @@ const { soName, name, theAnswer } = Astro.props;
     }, 3000);
   };
 
-  // Scroll Handler
+  // Modified Scroll Handler
   const handleScroll = () => {
     const isAtBottom =
       window.innerHeight + window.scrollY >=
       document.documentElement.scrollHeight - 100;
 
-    if (isAtBottom) {
+    // Only handle visibility changes if we haven't reached bottom before
+    if (isAtBottom && !hasReachedBottom) {
+      hasReachedBottom = true; // Mark that we've reached bottom
       elements.scrollMessage.classList.remove("visible");
       elements.loveCarousel.classList.add("visible");
       startCarousel();
       // Set isHidden to false when carousel is shown
       isHidden.set(false);
-    } else {
-      elements.loveCarousel.classList.remove("visible");
-      // Set isHidden to true when carousel is not visible
-      isHidden.set(true);
     }
 
     const scrollPosition = window.scrollY + window.innerHeight;
