@@ -171,6 +171,19 @@ const { soName, name, theAnswer } = Astro.props;
     opacity: 1;
   }
 
+  .love-reply-animation {
+    opacity: 0;
+    transition: opacity 2s ease;
+    width: 0;
+    height: 0;
+  }
+
+  .love-reply-animation.visible {
+    opacity: 1;
+    width: 100%;
+    height: fit-content;
+  }
+
   .love-message-slide {
     position: absolute;
     width: 100%;
@@ -235,6 +248,7 @@ const { soName, name, theAnswer } = Astro.props;
     soName: document.querySelector(".so-name") as HTMLElement,
     senderName: document.querySelector(".sender-name") as HTMLElement,
     loveMessage: document.querySelector(".love-message") as HTMLElement,
+    loveReplyAnimation: document.querySelector(".love-reply-animation") as HTMLElement,
     loveCarousel: document.querySelector(".love-carousel") as HTMLElement,
   };
 
@@ -364,6 +378,7 @@ const { soName, name, theAnswer } = Astro.props;
       hasReachedBottom = true; // Mark that we've reached bottom
       elements.scrollMessage.classList.remove("visible");
       elements.loveCarousel.classList.add("visible");
+      elements.loveReplyAnimation.classList.add("visible");
       startCarousel();
       // Set isHidden to false when carousel is shown
       isHidden.set(false);
@@ -478,7 +493,14 @@ const { soName, name, theAnswer } = Astro.props;
         </p>
 
         <!-- YES_NO Reply message -->
-        <div class="my-16" id="love-container">
+        <div class="mt-8 mb-16" id="love-container">
+          <div class="love-reply-animation mb-4">
+            <img
+              src={theAnswer === "1" ? "/assets/images/accept.gif" : "/assets/images/reject.gif"}
+              alt="Animation Accept / Reject"
+              class="w-48 h-48 mx-auto"
+            />
+          </div>
           <div class="love-carousel">
             {
               theAnswer === "1"
