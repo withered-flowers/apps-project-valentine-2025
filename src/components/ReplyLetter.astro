@@ -203,6 +203,21 @@ const { soName, name, theAnswer } = Astro.props;
   .sender-name.visible {
     opacity: 1;
   }
+
+  /* Modify the darkening text animation */
+  @keyframes darkenText {
+    0% {
+      color: #fb7185; /* Starting light pink */
+    }
+    100% {
+      color: #be185d; /* Ending with black */
+    }
+  }
+
+  /* Add specific styling for NO replies - make all text elements inside the slide darken */
+  .love-message-slide.active[data-reply-type="no"] p {
+    animation: darkenText 2s forwards;
+  }
 </style>
 
 <script>
@@ -384,12 +399,6 @@ const { soName, name, theAnswer } = Astro.props;
     if (scrollPosition > elements.soName.offsetTop) {
       elements.soName.classList.add("visible");
     }
-    if (
-      scrollPosition >
-      document.body.scrollHeight - elements.loveMessage.offsetHeight
-    ) {
-      elements.loveMessage.classList.add("visible");
-    }
   };
 
   // Event Handlers
@@ -496,7 +505,7 @@ const { soName, name, theAnswer } = Astro.props;
                     </div>
                   ))
                 : NO_REPLY_TO_SHOW.map((message) => (
-                    <div class="love-message-slide">
+                    <div class="love-message-slide" data-reply-type="no">
                       <p class="text-2xl font-secondary text-primary-accent">
                         {message.say}
                       </p>
