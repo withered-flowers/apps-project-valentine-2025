@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@astrojs/db": "^0.14.6",
+    "@astrojs/netlify": "^6.1.0",
     "@fontsource-variable/dancing-script": "^5.1.1",
     "@fontsource/itim": "^5.1.1",
     "@fontsource/sunshiney": "^5.1.1",

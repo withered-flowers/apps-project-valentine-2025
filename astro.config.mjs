@@ -7,11 +7,16 @@ import lottie from "astro-integration-lottie";
 
 import db from "@astrojs/db";
 
+import netlify from "@astrojs/netlify";
+
 // https://astro.build/config
 export default defineConfig({
-	integrations: [icon(), lottie(), db()],
-	trailingSlash: "never",
-	vite: {
-		plugins: [tailwindcss()],
+  integrations: [icon(), lottie(), db()],
+  trailingSlash: "never",
+
+  vite: {
+      plugins: [tailwindcss()],
 	},
+
+  adapter: netlify(),
 });
