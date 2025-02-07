@@ -43,6 +43,12 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
+  .submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   .spring {
     animation: springIn 1s ease;
   }
@@ -121,15 +127,56 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
+
+  .loading-spinner {
+    width: 0;
+    height: 0;
+    border: 0;
+    animation: spin 0.8s linear infinite;
+    margin-left: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .loading-spinner.show {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    margin-left: 8px;
+    border-top-color: transparent;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 </style>
 
 <script>
   import { actions, isInputError } from "astro:actions";
 
   const form = document.querySelector("form");
+  const submitButton = form?.querySelector(
+    'button[type="submit"]'
+  ) as HTMLButtonElement;
+  const loadingSpinner = form?.querySelector(".loading-spinner");
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    // Disable button and show loading spinner
+    if (submitButton) {
+      submitButton.disabled = true;
+      const spinnerElement = submitButton.querySelector(".loading-spinner");
+      (
+        submitButton.querySelector("span:first-child") as HTMLSpanElement
+      ).textContent = "Creating Valentine";
+      spinnerElement?.classList.add("show");
+    }
 
     const formData = new FormData(form);
     const input1ErrorField = document.querySelector(
@@ -145,58 +192,77 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     input1ErrorField.textContent = "";
     input2ErrorField.textContent = "";
 
-    const { data, error } = await actions.formHandler({
-      "your-name": formData.get("your-name") as string,
-      "so-name": formData.get("so-name") as string,
-    });
+    try {
+      const { data, error } = await actions.formHandler({
+        "your-name": formData.get("your-name") as string,
+        "so-name": formData.get("so-name") as string,
+      });
 
-    // Error Handler
-    if (error && isInputError(error)) {
-      if (error.fields["your-name"]) {
-        input1ErrorField.textContent =
-          error.fields["your-name"].join(", ") ?? "";
+      // Error Handler
+      if (error && isInputError(error)) {
+        if (error.fields["your-name"]) {
+          input1ErrorField.textContent =
+            error.fields["your-name"].join(", ") ?? "";
+        }
+
+        if (error.fields["so-name"]) {
+          input2ErrorField.textContent =
+            error.fields["so-name"].join(", ") ?? "";
+        }
+
+        // Reset button on error
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = "Create Valentine";
+        }
+
+        return;
       }
 
-      if (error.fields["so-name"]) {
-        input2ErrorField.textContent = error.fields["so-name"].join(", ") ?? "";
+      if (!error) {
+        demo.classList.add("hide");
+
+        const formTarget = e.target as HTMLFormElement;
+        formTarget.reset();
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = "mb-4 font-secondary";
+        messageDiv.textContent = `✨ With love in our hearts, we've created a special place just for you! ✨`;
+
+        const link = document.createElement("a");
+
+        link.className =
+          "underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300";
+        link.href = `/letters/${data.url}`;
+        link.textContent = "Send it to your Valentine's ❤️";
+        link.onclick = (e) => {
+          e.preventDefault();
+          navigator.clipboard.writeText(link.href).then(() => {
+            const notification = document.getElementById("notification");
+            notification?.classList.add("show");
+            setTimeout(() => {
+              notification?.classList.remove("show");
+            }, 2000);
+          });
+        };
+
+        response.textContent = ""; // Clear existing content
+
+        response.appendChild(messageDiv);
+        response.appendChild(link);
+
+        response.classList.add("success-message");
       }
-
-      return;
-    }
-
-    if (!error) {
-      demo.classList.add("hide");
-
-      const formTarget = e.target as HTMLFormElement;
-      formTarget.reset();
-
-      const messageDiv = document.createElement("div");
-      messageDiv.className = "mb-4 font-secondary";
-      messageDiv.textContent = `✨ With love in our hearts, we've created a special place just for you! ✨`;
-
-      const link = document.createElement("a");
-
-      link.className =
-        "underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300";
-      link.href = `/letters/${data.url}`;
-      link.textContent = "Send it to your Valentine's ❤️";
-      link.onclick = (e) => {
-        e.preventDefault();
-        navigator.clipboard.writeText(link.href).then(() => {
-          const notification = document.getElementById("notification");
-          notification?.classList.add("show");
-          setTimeout(() => {
-            notification?.classList.remove("show");
-          }, 2000);
-        });
-      };
-
-      response.textContent = ""; // Clear existing content
-
-      response.appendChild(messageDiv);
-      response.appendChild(link);
-
-      response.classList.add("success-message");
+    } finally {
+      // Reset button state if not already handled
+      if (submitButton && submitButton.disabled) {
+        submitButton.disabled = false;
+        const spinnerElement = submitButton.querySelector(".loading-spinner");
+        (
+          submitButton.querySelector("span:first-child") as HTMLSpanElement
+        ).textContent = "Create Valentine";
+        spinnerElement?.classList.remove("show");
+      }
     }
   });
 </script>
@@ -275,8 +341,10 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
         <!-- Submit Button -->
         <button
           type="submit"
-          class="submit-btn py-2 px-6 col-span-2 rounded-lg mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary"
-          >Create Valentine
+          class="submit-btn py-2 px-6 col-span-2 rounded-lg mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary flex items-center justify-center"
+        >
+          <span>Create Valentine</span>
+          <span class="loading-spinner"></span>
         </button>
       </form>
 
