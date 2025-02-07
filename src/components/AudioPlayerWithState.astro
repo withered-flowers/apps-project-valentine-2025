@@ -70,13 +70,11 @@ const { theAnswer } = Astro.props;
     // Subscribe to Store
     isHidden.subscribe((val: boolean) => {
       if (val) {
-        console.log("this will pause the audio");
         elements.audio.pause();
         elements.button.classList.remove("visible");
         elements.button.removeEventListener("click", audioPlayPause);
         elements.audio.removeEventListener("ended", audioReset);
       } else {
-        console.log("this will play the audio");
         elements.audio.play();
         elements.button.classList.add("visible");
         elements.button.addEventListener("click", audioPlayPause);
