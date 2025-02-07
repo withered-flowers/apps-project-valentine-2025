@@ -231,9 +231,7 @@ const { soName, name, theAnswer } = Astro.props;
     openText: document.querySelector(".open-text") as HTMLElement,
     scrollMessage: document.querySelector(".scroll-message") as HTMLElement,
     // Content Elements
-    contentContainer: document.querySelector(
-      ".content-container"
-    ) as HTMLElement,
+    contentContainer: document.querySelector(".content-container") as HTMLElement,
     soName: document.querySelector(".so-name") as HTMLElement,
     senderName: document.querySelector(".sender-name") as HTMLElement,
     loveMessage: document.querySelector(".love-message") as HTMLElement,
@@ -359,8 +357,7 @@ const { soName, name, theAnswer } = Astro.props;
   // Modified Scroll Handler
   const handleScroll = () => {
     const isAtBottom =
-      window.innerHeight + window.scrollY >=
-      document.documentElement.scrollHeight - 100;
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
 
     // Only handle visibility changes if we haven't reached bottom before
     if (isAtBottom && !hasReachedBottom) {
@@ -383,16 +380,12 @@ const { soName, name, theAnswer } = Astro.props;
     const scrollPosition = window.scrollY + window.innerHeight;
     const viewportHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
-    const scrollPercentage =
-      (window.scrollY / (documentHeight - viewportHeight)) * 100;
+    const scrollPercentage = (window.scrollY / (documentHeight - viewportHeight)) * 100;
 
     // Show SO name when scroll is around 33% of the total scrollable height
     if (scrollPercentage >= 33) {
       elements.senderName.classList.add("visible");
       elements.senderName.style.opacity = "1";
-    } else {
-      elements.senderName.classList.remove("visible");
-      elements.senderName.style.opacity = "0";
     }
 
     // Update other animations based on scroll position
@@ -479,11 +472,9 @@ const { soName, name, theAnswer } = Astro.props;
         </p>
 
         <!-- SO's Name -->
-        <p
-          class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
-        >
-          <b class="font-primary text-3xl md:text-5xl mr-1">{soName}</b>&nbsp;is
-          replying your mail with ...
+        <p class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0">
+          <b class="font-primary text-3xl md:text-5xl mr-1">{soName}</b>&nbsp;is replying your mail
+          with ...
         </p>
 
         <!-- YES_NO Reply message -->
@@ -493,26 +484,18 @@ const { soName, name, theAnswer } = Astro.props;
               theAnswer === "1"
                 ? YES_REPLY_TO_SHOW.map((message) => (
                     <div class="love-message-slide">
-                      <p class="text-2xl font-secondary text-primary-accent">
-                        {message.say}
-                      </p>
+                      <p class="text-2xl font-secondary text-primary-accent">{message.say}</p>
                       <p class="text-primary-accent">
-                        {message.pronounciation
-                          ? `(${message.pronounciation})`
-                          : null}
+                        {message.pronounciation ? `(${message.pronounciation})` : null}
                       </p>
                       <p class="love-language">{message.origin_language}</p>
                     </div>
                   ))
                 : NO_REPLY_TO_SHOW.map((message) => (
                     <div class="love-message-slide" data-reply-type="no">
-                      <p class="text-2xl font-secondary text-primary-accent">
-                        {message.say}
-                      </p>
+                      <p class="text-2xl font-secondary text-primary-accent">{message.say}</p>
                       <p class="text-primary-accent">
-                        {message.pronounciation
-                          ? `(${message.pronounciation})`
-                          : null}
+                        {message.pronounciation ? `(${message.pronounciation})` : null}
                       </p>
                       <p class="love-language">{message.origin_language}</p>
                     </div>
