@@ -357,6 +357,7 @@ const { name, soName, isAnswered } = Astro.props;
     loveContainer: document.getElementById("love-container"),
     choiceForm: document.getElementsByClassName("choice-form"),
     choiceStatement: document.getElementsByClassName("choice-statement"),
+    linkReply: document.querySelector(".link-reply") as HTMLAnchorElement,
   };
 
   // Utility Functions
@@ -429,7 +430,6 @@ const { name, soName, isAnswered } = Astro.props;
     }
 
     const scrollPosition = window.scrollY + window.innerHeight;
-    const currentScrollTop = window.scrollY;
 
     if (scrollPosition > elements.soName.offsetTop) {
       elements.soName.classList.add("visible");
@@ -529,6 +529,20 @@ const { name, soName, isAnswered } = Astro.props;
     }
   };
 
+  const handleLinkClick = (event: MouseEvent) => {
+    event.preventDefault();
+    const target = event.currentTarget as HTMLAnchorElement;
+    navigator.clipboard.writeText(target.href).then(() => {
+      const notification = document.getElementById("notification");
+      if (notification) {
+        notification.classList.add("show");
+        setTimeout(() => {
+          notification.classList.remove("show");
+        }, 2000);
+      }
+    });
+  };
+
   // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     // Initial setup
@@ -545,6 +559,7 @@ const { name, soName, isAnswered } = Astro.props;
       e.preventDefault();
       handleFormSubmit(false);
     });
+    elements.linkReply.addEventListener("click", handleLinkClick);
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Start carousel when content becomes visible
@@ -642,19 +657,12 @@ const { name, soName, isAnswered } = Astro.props;
               >
                 Here&apos;s {soName}&apos;s reply ♥<br />
                 <a
-                  class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
+                  class="link-reply underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
                   href={name !== DUMMY_SENDER && soName !== DUMMY_RECEIVER
                     ? `/letters/${id}/reply`
                     : `/letters/demo/reply`}
-                  onclick="event.preventDefault(); navigator.clipboard.writeText(this.href).then(() => {
-                    const notification = document.getElementById('notification');
-                    notification.classList.add('show');
-                    setTimeout(() => {
-                      notification.classList.remove('show');
-                    }, 2000);
-                  });"
                 >
-                  {soName}&apos;s Reply Letter
+                  Send this reply to {name}
                 </a>
               </p>
             </div>
