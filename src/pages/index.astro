@@ -170,16 +170,31 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       const formTarget = e.target as HTMLFormElement;
       formTarget.reset();
 
-      const successMessage = `<div class="mb-4 font-secondary">✨ With love in our hearts, we've created a special place just for you! ✨</div>`;
-      response.innerHTML =
-        successMessage +
-        `<a class="underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300" href=${`/letters/${data.url}`} onclick="event.preventDefault(); navigator.clipboard.writeText(this.href).then(() => {
-          const notification = document.getElementById('notification');
-          notification.classList.add('show');
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "mb-4 font-secondary";
+      messageDiv.textContent = `✨ With love in our hearts, we've created a special place just for you! ✨`;
+
+      const link = document.createElement("a");
+
+      link.className =
+        "underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300";
+      link.href = `/letters/${data.url}`;
+      link.textContent = "Send it to your Valentine's ❤️";
+      link.onclick = (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText(link.href).then(() => {
+          const notification = document.getElementById("notification");
+          notification?.classList.add("show");
           setTimeout(() => {
-            notification.classList.remove('show');
+            notification?.classList.remove("show");
           }, 2000);
-        });">Send it to your Valentine's ❤️</a>`;
+        });
+      };
+
+      response.textContent = ""; // Clear existing content
+
+      response.appendChild(messageDiv);
+      response.appendChild(link);
 
       response.classList.add("success-message");
     }
