@@ -110,8 +110,12 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     e.preventDefault();
 
     const formData = new FormData(form);
-    const input1ErrorField = document.querySelector("#your-name-error") as HTMLDivElement;
-    const input2ErrorField = document.querySelector("#so-name-error") as HTMLDivElement;
+    const input1ErrorField = document.querySelector(
+      "#your-name-error"
+    ) as HTMLDivElement;
+    const input2ErrorField = document.querySelector(
+      "#so-name-error"
+    ) as HTMLDivElement;
     const response = document.querySelector("#response") as HTMLDivElement;
     const demo = document.querySelector(".demo") as HTMLDivElement;
 
@@ -127,7 +131,8 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     // Error Handler
     if (error && isInputError(error)) {
       if (error.fields["your-name"]) {
-        input1ErrorField.textContent = error.fields["your-name"].join(", ") ?? "";
+        input1ErrorField.textContent =
+          error.fields["your-name"].join(", ") ?? "";
       }
 
       if (error.fields["so-name"]) {
@@ -147,7 +152,7 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       const successMessage = `<div class="mb-4 font-secondary">✨ With love in our hearts, we've created a special place just for you! ✨</div>`;
       response.innerHTML =
         successMessage +
-        `<a class="underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300" href=${`/letters/${data.url}`}>Visit your Valentine's page ❤️</a>`;
+        `<a class="underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300" href=${`/letters/${data.url}`}>Send it to your Valentine's ❤️</a>`;
 
       response.classList.add("success-message");
     }
@@ -158,11 +163,19 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
   <SlotCentered>
     <!-- Header  -->
     <div class="flex flex-row gap-4 items-center px-8 md:px-0">
-      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <LottieAnimation
+        class="w-8 h-8 mx-auto"
+        src="assets/lotties/heart.json"
+        autoplay="visible"
+      />
       <h1 class="font-secondary text-3xl text-primary-accent text-center">
         Welcome to Project Valentine
       </h1>
-      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <LottieAnimation
+        class="w-8 h-8 mx-auto"
+        src="assets/lotties/heart.json"
+        autoplay="visible"
+      />
     </div>
     <!-- Content -->
     <div class="spring w-full">
@@ -189,7 +202,10 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
             name="your-name"
             class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
           />
-          <div id="your-name-error" class="mt-2 text-center font-tertiary text-tertiary-accent">
+          <div
+            id="your-name-error"
+            class="mt-2 text-center font-tertiary text-tertiary-accent"
+          >
           </div>
         </div>
 
@@ -207,7 +223,11 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
             name="so-name"
             class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
           />
-          <div id="so-name-error" class="mt-2 text-center font-tertiary text-tertiary-accent"></div>
+          <div
+            id="so-name-error"
+            class="mt-2 text-center font-tertiary text-tertiary-accent"
+          >
+          </div>
         </div>
 
         <!-- Submit Button -->
@@ -219,7 +239,11 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       </form>
 
       <!-- Response Form Submission -->
-      <div id="response" class="mb-2 text-center text-primary-accent font-tertiary text-2xl"></div>
+      <div
+        id="response"
+        class="mb-2 text-center text-primary-accent font-tertiary text-2xl"
+      >
+      </div>
 
       <!-- See the demo -->
       <div class="demo flex flex-col items-center justify-center mt-4">
