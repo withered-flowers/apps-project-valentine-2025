@@ -160,3 +160,6 @@ export const NO_REPLY_TO_SHOW = [
 		origin_language: "Danish",
 	},
 ];
+
+export const DUMMY_SENDER = "Withered Flowers";
+export const DUMMY_RECEIVER = "Moon Dev";

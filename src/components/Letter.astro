@@ -1,6 +1,8 @@
 ---
 import { MESSAGE_TO_SHOW } from "@/constant";
 
+import { DUMMY_RECEIVER, DUMMY_SENDER } from "@/constant.ts";
+
 const { id } = Astro.params;
 const { name, soName, isAnswered } = Astro.props;
 ---
@@ -595,7 +597,9 @@ const { name, soName, isAnswered } = Astro.props;
                 Here&apos;s {soName}&apos;s reply ♥<br />
                 <a
                   class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
-                  href={`/letters/${id}/reply`}>{soName}&apos;s Reply Letter</a
+                  href={name !== DUMMY_SENDER && soName !== DUMMY_RECEIVER
+                    ? `/letters/${id}/reply`
+                    : `/letters/demo/reply`}>{soName}&apos;s Reply Letter</a
                 >
               </p>
             </div>
