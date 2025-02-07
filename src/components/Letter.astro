@@ -174,6 +174,7 @@ const { name, soName, isAnswered } = Astro.props;
   .scroll-message {
     position: fixed;
     bottom: 10rem;
+    left: 50%;
     transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.5s ease;
@@ -316,7 +317,9 @@ const { name, soName, isAnswered } = Astro.props;
   // DOM Elements
   const elements = {
     envelope: document.querySelector(".envelope") as HTMLElement,
-    contentContainer: document.querySelector(".content-container") as HTMLElement,
+    contentContainer: document.querySelector(
+      ".content-container"
+    ) as HTMLElement,
     stickyContainer: document.querySelector(".sticky-container") as HTMLElement,
     scrollMessage: document.querySelector(".scroll-message") as HTMLElement,
     openText: document.querySelector(".open-text") as HTMLElement,
@@ -396,7 +399,8 @@ const { name, soName, isAnswered } = Astro.props;
 
   const handleScroll = () => {
     const isAtBottom =
-      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 100;
 
     if (isAtBottom) {
       elements.scrollMessage.classList.remove("visible");
@@ -411,7 +415,10 @@ const { name, soName, isAnswered } = Astro.props;
     if (scrollPosition > document.body.scrollHeight / 2) {
       elements.senderName.classList.add("visible");
     }
-    if (scrollPosition > document.body.scrollHeight - elements.loveMessage.offsetHeight) {
+    if (
+      scrollPosition >
+      document.body.scrollHeight - elements.loveMessage.offsetHeight
+    ) {
       if (!hasReachedBottom) {
         createLoveShower();
         hasReachedBottom = true;
@@ -423,7 +430,8 @@ const { name, soName, isAnswered } = Astro.props;
 
   // Initialize Function
   const initQuestionOrAnswer = () => {
-    const isAnsweredYet = elements.contentContainer.getAttribute("data-is-answered");
+    const isAnsweredYet =
+      elements.contentContainer.getAttribute("data-is-answered");
 
     if (isAnsweredYet !== "true") {
       elements.choiceForm.item(0)?.classList.remove("hidden");
@@ -482,7 +490,10 @@ const { name, soName, isAnswered } = Astro.props;
       });
 
       if (!error) {
-        elements.contentContainer.setAttribute("data-is-answered", String(data.result));
+        elements.contentContainer.setAttribute(
+          "data-is-answered",
+          String(data.result)
+        );
 
         elements.choiceForm.item(0)?.classList.add("hidden");
         elements.choiceForm.item(1)?.classList.add("hidden");
@@ -546,7 +557,11 @@ const { name, soName, isAnswered } = Astro.props;
 
 <div class="scroll-message font-primary">Scroll down ↓</div>
 
-<div class="content-container md:w-1/2 w-full" data-slug={id} data-is-answered={isAnswered}>
+<div
+  class="content-container md:w-1/2 w-full"
+  data-slug={id}
+  data-is-answered={isAnswered}
+>
   <div class="h-[300vh] relative scroll-smooth sticky-container">
     <div class="sticky top-0 h-screen flex items-center justify-center">
       <div class="w-full text-center p-10">
@@ -563,7 +578,8 @@ const { name, soName, isAnswered } = Astro.props;
           class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
           data-name={name}
         >
-          <b class="font-primary text-3xl md:text-5xl mr-1">{name}</b> just wanna ask ...
+          <b class="font-primary text-3xl md:text-5xl mr-1">{name}</b> just wanna
+          ask ...
         </p>
 
         <!-- I Love You message -->
@@ -572,9 +588,13 @@ const { name, soName, isAnswered } = Astro.props;
             {
               MESSAGE_TO_SHOW.map((message) => (
                 <div class="love-message-slide">
-                  <p class="text-2xl font-secondary text-primary-accent">{message.say}</p>
+                  <p class="text-2xl font-secondary text-primary-accent">
+                    {message.say}
+                  </p>
                   <p class="text-primary-accent">
-                    {message.pronounciation ? `(${message.pronounciation})` : null}
+                    {message.pronounciation
+                      ? `(${message.pronounciation})`
+                      : null}
                   </p>
                   <p class="love-language">{message.origin_language}</p>
                 </div>
@@ -590,10 +610,14 @@ const { name, soName, isAnswered } = Astro.props;
               <button class="choice-button maybe-button">Maybe</button>
             </form>
             <div class="flex flex-col gap-2">
-              <p class="choice-statement font-tertiary text-xl text-primary-accent">
+              <p
+                class="choice-statement font-tertiary text-xl text-primary-accent"
+              >
                 ~ Thanks for answering the questions ~
               </p>
-              <p class="choice-statement font-secondary text-base text-primary-accent">
+              <p
+                class="choice-statement font-secondary text-base text-primary-accent"
+              >
                 Here&apos;s {soName}&apos;s reply ♥<br />
                 <a
                   class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
