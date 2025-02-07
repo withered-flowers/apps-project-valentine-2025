@@ -99,6 +99,28 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       opacity: 1;
     }
   }
+
+  /* Notification Styles */
+  .notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    background-color: #fb7185;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 </style>
 
 <script>
@@ -110,8 +132,12 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     e.preventDefault();
 
     const formData = new FormData(form);
-    const input1ErrorField = document.querySelector("#your-name-error") as HTMLDivElement;
-    const input2ErrorField = document.querySelector("#so-name-error") as HTMLDivElement;
+    const input1ErrorField = document.querySelector(
+      "#your-name-error"
+    ) as HTMLDivElement;
+    const input2ErrorField = document.querySelector(
+      "#so-name-error"
+    ) as HTMLDivElement;
     const response = document.querySelector("#response") as HTMLDivElement;
     const demo = document.querySelector(".demo") as HTMLDivElement;
 
@@ -127,7 +153,8 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     // Error Handler
     if (error && isInputError(error)) {
       if (error.fields["your-name"]) {
-        input1ErrorField.textContent = error.fields["your-name"].join(", ") ?? "";
+        input1ErrorField.textContent =
+          error.fields["your-name"].join(", ") ?? "";
       }
 
       if (error.fields["so-name"]) {
@@ -138,16 +165,36 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     }
 
     if (!error) {
-      console.log(demo);
       demo.classList.add("hide");
 
       const formTarget = e.target as HTMLFormElement;
       formTarget.reset();
 
-      const successMessage = `<div class="mb-4 font-secondary">✨ With love in our hearts, we've created a special place just for you! ✨</div>`;
-      response.innerHTML =
-        successMessage +
-        `<a class="underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300" href=${`/letters/${data.url}`}>Visit your Valentine's page ❤️</a>`;
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "mb-4 font-secondary";
+      messageDiv.textContent = `✨ With love in our hearts, we've created a special place just for you! ✨`;
+
+      const link = document.createElement("a");
+
+      link.className =
+        "underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300";
+      link.href = `/letters/${data.url}`;
+      link.textContent = "Send it to your Valentine's ❤️";
+      link.onclick = (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText(link.href).then(() => {
+          const notification = document.getElementById("notification");
+          notification?.classList.add("show");
+          setTimeout(() => {
+            notification?.classList.remove("show");
+          }, 2000);
+        });
+      };
+
+      response.textContent = ""; // Clear existing content
+
+      response.appendChild(messageDiv);
+      response.appendChild(link);
 
       response.classList.add("success-message");
     }
@@ -158,11 +205,19 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
   <SlotCentered>
     <!-- Header  -->
     <div class="flex flex-row gap-4 items-center px-8 md:px-0">
-      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <LottieAnimation
+        class="w-8 h-8 mx-auto"
+        src="assets/lotties/heart.json"
+        autoplay="visible"
+      />
       <h1 class="font-secondary text-3xl text-primary-accent text-center">
         Welcome to Project Valentine
       </h1>
-      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <LottieAnimation
+        class="w-8 h-8 mx-auto"
+        src="assets/lotties/heart.json"
+        autoplay="visible"
+      />
     </div>
     <!-- Content -->
     <div class="spring w-full">
@@ -189,7 +244,10 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
             name="your-name"
             class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
           />
-          <div id="your-name-error" class="mt-2 text-center font-tertiary text-tertiary-accent">
+          <div
+            id="your-name-error"
+            class="mt-2 text-center font-tertiary text-tertiary-accent"
+          >
           </div>
         </div>
 
@@ -207,7 +265,11 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
             name="so-name"
             class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
           />
-          <div id="so-name-error" class="mt-2 text-center font-tertiary text-tertiary-accent"></div>
+          <div
+            id="so-name-error"
+            class="mt-2 text-center font-tertiary text-tertiary-accent"
+          >
+          </div>
         </div>
 
         <!-- Submit Button -->
@@ -219,7 +281,11 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
       </form>
 
       <!-- Response Form Submission -->
-      <div id="response" class="mb-2 text-center text-primary-accent font-tertiary text-2xl"></div>
+      <div
+        id="response"
+        class="mb-2 text-center text-primary-accent font-tertiary text-2xl"
+      >
+      </div>
 
       <!-- See the demo -->
       <div class="demo flex flex-col items-center justify-center mt-4">
@@ -235,3 +301,6 @@ import LottieAnimation from "astro-integration-lottie/Lottie.astro";
     </div>
   </SlotCentered>
 </Layout>
+
+<!-- Add notification element at the bottom -->
+<div id="notification" class="notification">URL copied to clipboard!</div>
