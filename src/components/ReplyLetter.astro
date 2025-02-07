@@ -311,27 +311,12 @@ const { soName, name, theAnswer } = Astro.props;
       return Math.random() * (max - min) + min;
     }
 
-    let frameCount = 0;
-    const maxFrames = 600;
-    let intervalId: number | null = null;
-
     // Calculate viewport height ratio
     const viewportHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     let heightRatio = viewportHeight / documentHeight;
 
-    intervalId = window.setInterval(() => {
-      if (
-        frameCount >= maxFrames ||
-        !elements.contentContainer.classList.contains("visible")
-      ) {
-        if (intervalId !== null) {
-          window.clearInterval(intervalId);
-        }
-        return;
-      }
-
-      frameCount++;
+    setInterval(() => {
       const particleCount = 3;
 
       // Get current scroll position
@@ -352,37 +337,8 @@ const { soName, name, theAnswer } = Astro.props;
         shapes: [waterDropShape],
         scalar: randomInRange(0.3, 0.6),
         ticks: 150,
-        disableForReducedMotion: true,
       });
     }, 30);
-
-    // Add resize handler to update height ratio
-    const handleResize = () => {
-      const newViewportHeight = window.innerHeight;
-      const newDocumentHeight = document.documentElement.scrollHeight;
-      heightRatio = newViewportHeight / newDocumentHeight;
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden && intervalId !== null) {
-        window.clearInterval(intervalId);
-      }
-    });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting && intervalId !== null) {
-          window.clearInterval(intervalId);
-          window.removeEventListener("resize", handleResize);
-        }
-      },
-      { threshold: 0 }
-    );
-
-    observer.observe(elements.contentContainer);
   };
 
   // Modified Scroll Handler
