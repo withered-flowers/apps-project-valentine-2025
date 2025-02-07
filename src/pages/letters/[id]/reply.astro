@@ -1,0 +1,49 @@
+---
+import { Love, db, eq } from "astro:db";
+import AudioPlayerWithState from "@/components/AudioPlayerWithState.astro";
+import ErrorLetter from "@/components/ErrorLetter.astro";
+import NotRepliedYet from "@/components/NotRepliedYet.astro";
+import ReplyLetter from "@/components/ReplyLetter.astro";
+import SlotCentered from "@/components/SlotCentered.astro";
+import Layout from "@/layouts/Layout.astro";
+
+export const prerender = false;
+
+let isError = false;
+let isNotReplied = false;
+
+const { id } = Astro.params;
+
+const love = await db
+  .select()
+  .from(Love)
+  .where(eq(Love.slug, id ?? ""))
+  .limit(1);
+
+if (!love || love.length === 0) {
+  isError = true;
+} else {
+  isNotReplied = love[0].the_answer === null;
+}
+---
+
+<Layout title={id}>
+  <SlotCentered>
+    {
+      isError ? (
+        <ErrorLetter />
+      ) : isNotReplied ? (
+        <NotRepliedYet soName={love[0].significant_other_name} />
+      ) : (
+        <>
+          <ReplyLetter
+            name={love[0].name}
+            soName={love[0].significant_other_name}
+            theAnswer={love[0].the_answer}
+          />
+          <AudioPlayerWithState theAnswer={love[0].the_answer} />
+        </>
+      )
+    }
+  </SlotCentered>
+</Layout>

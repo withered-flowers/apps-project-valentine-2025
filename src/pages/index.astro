@@ -1,10 +1,237 @@
 ---
+import SlotCentered from "@/components/SlotCentered.astro";
 import Layout from "@/layouts/Layout.astro";
-import SlotCentered from "@/layouts/SlotCentered.astro";
+import LottieAnimation from "astro-integration-lottie/Lottie.astro";
 ---
+
+<style>
+  .form-container {
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideUp 0.8s ease forwards;
+  }
+
+  .input-group {
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+
+  .input-group:hover {
+    transform: translateY(-2px);
+  }
+
+  input {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--secondary-accent);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: scale(1.02);
+  }
+
+  .submit-btn {
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .spring {
+    animation: springIn 1s ease;
+  }
+
+  .success-message {
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  .demo {
+    opacity: 1;
+  }
+
+  .demo.hide {
+    opacity: 0;
+    animation: fadeOut 1s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes slideUp {
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes springIn {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  import { actions, isInputError } from "astro:actions";
+
+  const form = document.querySelector("form");
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const input1ErrorField = document.querySelector("#your-name-error") as HTMLDivElement;
+    const input2ErrorField = document.querySelector("#so-name-error") as HTMLDivElement;
+    const response = document.querySelector("#response") as HTMLDivElement;
+    const demo = document.querySelector(".demo") as HTMLDivElement;
+
+    // Reset Error Fields
+    input1ErrorField.textContent = "";
+    input2ErrorField.textContent = "";
+
+    const { data, error } = await actions.formHandler({
+      "your-name": formData.get("your-name") as string,
+      "so-name": formData.get("so-name") as string,
+    });
+
+    // Error Handler
+    if (error && isInputError(error)) {
+      if (error.fields["your-name"]) {
+        input1ErrorField.textContent = error.fields["your-name"].join(", ") ?? "";
+      }
+
+      if (error.fields["so-name"]) {
+        input2ErrorField.textContent = error.fields["so-name"].join(", ") ?? "";
+      }
+
+      return;
+    }
+
+    if (!error) {
+      console.log(demo);
+      demo.classList.add("hide");
+
+      const formTarget = e.target as HTMLFormElement;
+      formTarget.reset();
+
+      const successMessage = `<div class="mb-4 font-secondary">✨ With love in our hearts, we've created a special place just for you! ✨</div>`;
+      response.innerHTML =
+        successMessage +
+        `<a class="underline font-bold text-secondary-accent hover:text-primary-accent transition-colors duration-300" href=${`/letters/${data.url}`}>Visit your Valentine's page ❤️</a>`;
+
+      response.classList.add("success-message");
+    }
+  });
+</script>
 
 <Layout title="Hello Valentine">
   <SlotCentered>
-    <h1 class="font-secondary text-3xl text-primary-accent">Welcome to Project Valentine</h1>
+    <!-- Header  -->
+    <div class="flex flex-row gap-4 items-center px-8 md:px-0">
+      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+      <h1 class="font-secondary text-3xl text-primary-accent text-center">
+        Welcome to Project Valentine
+      </h1>
+      <LottieAnimation class="w-8 h-8 mx-auto" src="assets/lotties/heart.json" autoplay="visible" />
+    </div>
+    <!-- Content -->
+    <div class="spring w-full">
+      <p class="font-secondary text-lg text-primary-accent text-center">
+        A website to show your love for your significant other
+      </p>
+
+      <!-- Form Submission -->
+      <form
+        method="post"
+        class="form-container grid grid-cols-2 items-center gap-3 max-w-2xl mx-auto p-6 rounded-lg bg-white/5 backdrop-blur-sm"
+      >
+        <!-- Input 1 -->
+        <div class="input-group col-span-2 md:col-span-1">
+          <label
+            for="your-name"
+            class="font-secondary text-primary-accent text-base text-center block mb-2"
+          >
+            Enter Name 1
+          </label>
+          <input
+            type="text"
+            placeholder="Your Name"
+            name="your-name"
+            class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
+          />
+          <div id="your-name-error" class="mt-2 text-center font-tertiary text-tertiary-accent">
+          </div>
+        </div>
+
+        <!-- Input 2 -->
+        <div class="input-group col-span-2 md:col-span-1">
+          <label
+            for="so-name"
+            class="font-secondary text-primary-accent text-base text-center block mb-2"
+          >
+            Enter Name 2
+          </label>
+          <input
+            type="text"
+            placeholder="Significant Other's Name"
+            name="so-name"
+            class="w-full py-2 px-4 rounded-lg mx-auto font-secondary text-tertiary-accent"
+          />
+          <div id="so-name-error" class="mt-2 text-center font-tertiary text-tertiary-accent"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="submit-btn py-2 px-6 col-span-2 rounded-lg mx-auto bg-secondary-accent hover:bg-secondary text-white hover:text-secondary-accent font-secondary"
+          >Create Valentine
+        </button>
+      </form>
+
+      <!-- Response Form Submission -->
+      <div id="response" class="mb-2 text-center text-primary-accent font-tertiary text-2xl"></div>
+
+      <!-- See the demo -->
+      <div class="demo flex flex-col items-center justify-center mt-4">
+        <p class="font-secondary text-lg text-primary-accent text-center">
+          Want to see how it looks?
+        </p>
+        <a
+          href="/letters/demo"
+          class="underline font-bold font-primary text-3xl text-secondary-accent hover:text-primary-accent transition-colors duration-300"
+          >See the demo</a
+        >
+      </div>
+    </div>
   </SlotCentered>
 </Layout>

@@ -1,0 +1,17 @@
+---
+import AudioPlayerWithState from "@/components/AudioPlayerWithState.astro";
+import ReplyLetter from "@/components/ReplyLetter.astro";
+import SlotCentered from "@/components/SlotCentered.astro";
+import Layout from "@/layouts/Layout.astro";
+
+import { DUMMY_RECEIVER, DUMMY_SENDER } from "@/constant.ts";
+
+export const prerender = true;
+---
+
+<Layout title="Letters - Demo - Reply">
+  <SlotCentered>
+    <ReplyLetter name={DUMMY_SENDER} soName={DUMMY_RECEIVER} theAnswer="1" />
+    <AudioPlayerWithState theAnswer="1" />
+  </SlotCentered>
+</Layout>

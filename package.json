@@ -1,20 +1,30 @@
 {
   "name": "project-valentine",
-  "type": "module",
   "version": "0.0.1",
+  "dependencies": {
+    "@astrojs/db": "^0.14.6",
+    "@fontsource-variable/dancing-script": "^5.1.1",
+    "@fontsource/itim": "^5.1.1",
+    "@fontsource/sunshiney": "^5.1.1",
+    "@iconify-json/mdi": "^1.2.3",
+    "@tailwindcss/vite": "^4.0.2",
+    "astro": "5.2.3",
+    "astro-icon": "^1.1.5",
+    "astro-integration-lottie": "^0.3.2",
+    "canvas-confetti": "^1.9.3",
+    "lottie-web": "^5.12.2",
+    "nanoid": "^5.0.9",
+    "nanostores": "^0.11.3",
+    "tailwindcss": "^4.0.2"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
-  "dependencies": {
-    "@astrojs/tailwind": "^5.1.4",
-    "@fontsource-variable/dancing-script": "^5.1.1",
-    "@fontsource/itim": "^5.1.1",
-    "@fontsource/sunshiney": "^5.1.1",
-    "astro": "^5.1.7",
-    "motion": "^11.18.1",
-    "tailwindcss": "^3.4.17"
+  "type": "module",
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0"
   }
 }

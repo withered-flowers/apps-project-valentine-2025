@@ -1,0 +1,85 @@
+---
+import { Icon } from "astro-icon/components";
+
+const { theAnswer } = Astro.props;
+---
+
+<style>
+  #audio-button {
+    transition: opacity 3s ease;
+  }
+
+  #audio-button.visible {
+    opacity: 1;
+  }
+</style>
+
+<button
+  class="fixed z-90 bottom-[5vh] md:left-[90vw] lg:left-[94vw] bg-primary-accent w-16 h-16 rounded-full drop-shadow-lg flex justify-center items-center text-standard-tertiary text-4xl hover:bg-standard-primary/90 hover:animate-pulse duration-300 opacity-0"
+  id="audio-button"
+  aria-label="Play music"
+>
+  <Icon id="volume-off" name="mdi:volume-off" class="hidden text-white" />
+  <Icon id="volume-on" name="mdi:volume" class="text-white" />
+</button>
+
+<audio id="audio-source">
+  <source
+    src={theAnswer === "1"
+      ? "/assets/musics/accept.mp3"
+      : "/assets/musics/reject.mp3"}
+    type="audio/mpeg"
+  />
+</audio>
+
+<script>
+  import { isHidden } from "@/stores/audio-button-state";
+
+  // DOM Elements
+  const elements = {
+    audio: document.getElementById("audio-source") as HTMLAudioElement,
+    button: document.getElementById("audio-button") as HTMLButtonElement,
+    volumeOff: document.getElementById("volume-off") as HTMLElement,
+    volumeOn: document.getElementById("volume-on") as HTMLElement,
+  };
+
+  // Utility Functions
+  const audioPlayPause = async () => {
+    try {
+      if (elements.audio.paused) {
+        await elements.audio.play();
+        elements.volumeOff.classList.add("hidden");
+        elements.volumeOn.classList.remove("hidden");
+      } else {
+        elements.audio.pause();
+        elements.volumeOff.classList.remove("hidden");
+        elements.volumeOn.classList.add("hidden");
+      }
+    } catch (error) {
+      console.log("Audio playback failed:", error);
+    }
+  };
+
+  const audioReset = () => {
+    elements.audio.currentTime = 0;
+    elements.audio.play();
+  };
+
+  // Initial Setup
+  document.addEventListener("DOMContentLoaded", function () {
+    // Subscribe to Store
+    isHidden.subscribe((val: boolean) => {
+      if (val) {
+        elements.audio.pause();
+        elements.button.classList.remove("visible");
+        elements.button.removeEventListener("click", audioPlayPause);
+        elements.audio.removeEventListener("ended", audioReset);
+      } else {
+        elements.audio.play();
+        elements.button.classList.add("visible");
+        elements.button.addEventListener("click", audioPlayPause);
+        elements.audio.addEventListener("ended", audioReset);
+      }
+    });
+  });
+</script>

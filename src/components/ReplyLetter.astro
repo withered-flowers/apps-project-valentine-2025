@@ -1,0 +1,531 @@
+---
+import { NO_REPLY_TO_SHOW, YES_REPLY_TO_SHOW } from "@/constant";
+
+const { soName, name, theAnswer } = Astro.props;
+---
+
+<style>
+  /* Base Animations */
+  @keyframes spring {
+    0% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+    75% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Envelope Styles */
+  .envelope {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: #ffe4e6;
+    border: 2px solid #ffd1d6;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    perspective: 1000px;
+  }
+
+  .envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 100px solid #ffd1d6;
+    transform-origin: top;
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
+
+  .envelope-letter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: white;
+    transform-origin: center;
+    transition: transform 0.8s ease;
+    z-index: 2;
+  }
+
+  .envelope::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: height 0.3s ease;
+  }
+
+  /* Envelope States */
+  .envelope.opened .envelope-flap {
+    transform: rotateX(180deg);
+  }
+
+  .envelope.opened .envelope-letter {
+    transform: translateY(-120%);
+  }
+
+  .envelope:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  .envelope:hover::after {
+    height: 10px;
+  }
+
+  .envelope.hide {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    transition:
+      transform 0.8s ease,
+      opacity 0.6s ease;
+  }
+
+  /* Open Text */
+  .open-text {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fb7185;
+    font-size: 1.2rem;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .open-text.hide {
+    opacity: 0;
+  }
+
+  .scroll-message {
+    position: fixed;
+    bottom: 10rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: #fb7185;
+    font-size: 1.2rem;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-message.visible {
+    opacity: 1;
+  }
+
+  /* Content Container Styles */
+  .content-container {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  .content-container.show {
+    display: block;
+    opacity: 0;
+  }
+
+  .content-container.show.visible {
+    opacity: 1;
+  }
+
+  /* Animation Classess */
+  .so-name.visible,
+  .sender-name.visible {
+    animation: spring 2s ease-in-out forwards;
+  }
+
+  .love-message.visible {
+    animation: spring 2s ease-in-out infinite;
+  }
+
+  /* Love Carousel */
+  .love-carousel {
+    position: relative;
+    overflow: hidden;
+    height: 8rem;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .love-carousel.visible {
+    opacity: 1;
+  }
+
+  .love-reply-animation {
+    opacity: 0;
+    transition: opacity 2s ease;
+    width: 0;
+    height: 0;
+  }
+
+  .love-reply-animation.visible {
+    opacity: 1;
+    width: 100%;
+    height: fit-content;
+  }
+
+  .love-message-slide {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+  }
+
+  .love-message-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .love-message-slide.previous {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  .love-language {
+    font-size: 0.875rem;
+    color: #fb7185;
+    font-style: italic;
+  }
+
+  .sender-name {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .sender-name.visible {
+    opacity: 1;
+  }
+
+  /* Modify the darkening text animation */
+  @keyframes darkenText {
+    0% {
+      color: #fb7185; /* Starting light pink */
+    }
+    100% {
+      color: #be185d; /* Ending with black */
+    }
+  }
+
+  /* Add specific styling for NO replies - make all text elements inside the slide darken */
+  .love-message-slide.active[data-reply-type="no"] p {
+    animation: darkenText 2s forwards;
+  }
+</style>
+
+<script>
+  import confetti from "canvas-confetti";
+  import { isHidden } from "@/stores/audio-button-state";
+
+  // DOM Elements
+  const elements = {
+    // Envelope Elements
+    envelope: document.querySelector(".envelope") as HTMLElement,
+    openText: document.querySelector(".open-text") as HTMLElement,
+    scrollMessage: document.querySelector(".scroll-message") as HTMLElement,
+    // Content Elements
+    contentContainer: document.querySelector(".content-container") as HTMLElement,
+    soName: document.querySelector(".so-name") as HTMLElement,
+    senderName: document.querySelector(".sender-name") as HTMLElement,
+    loveMessage: document.querySelector(".love-message") as HTMLElement,
+    loveReplyAnimation: document.querySelector(".love-reply-animation") as HTMLElement,
+    loveCarousel: document.querySelector(".love-carousel") as HTMLElement,
+  };
+
+  // Variables
+  let carouselStarted = false;
+  let hasReachedBottom = false;
+
+  // Carousel Functions
+  const startCarousel = () => {
+    if (carouselStarted) return;
+
+    const slides = document.querySelectorAll(".love-message-slide");
+    let currentSlide = 0;
+
+    // Only start the carousel when it's visible
+    if (!elements.loveCarousel.classList.contains("visible")) {
+      return;
+    }
+
+    carouselStarted = true;
+    slides[0].classList.add("active");
+
+    setInterval(() => {
+      slides[currentSlide].classList.remove("active");
+      slides[currentSlide].classList.add("previous");
+
+      currentSlide = (currentSlide + 1) % slides.length;
+
+      slides[currentSlide].classList.remove("previous");
+      slides[currentSlide].classList.add("active");
+
+      setTimeout(() => {
+        slides.forEach((slide, index) => {
+          if (index !== currentSlide) {
+            slide.classList.remove("previous");
+          }
+        });
+      }, 500);
+    }, 3000);
+  };
+
+  const createLoveShower = () => {
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 150,
+      zIndex: 0,
+    };
+
+    const loveShape = confetti.shapeFromPath({
+      path: `m12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53z`,
+    });
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Create an infinite interval
+    setInterval(function () {
+      const particleCount = 10;
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+        colors: ["#ff0000", "#ff69b4", "#ff1493", "#ff007f"],
+        shapes: [loveShape],
+      });
+    }, 250);
+  };
+
+  const createRainfall = () => {
+    const defaults = {
+      startVelocity: 20,
+      spread: 20,
+      ticks: 300,
+      zIndex: 0,
+      scalar: 0.5,
+    };
+
+    // Water drop shape
+    const waterDropShape = confetti.shapeFromPath({
+      path: "M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z",
+    });
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Calculate viewport height ratio
+    const viewportHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    let heightRatio = viewportHeight / documentHeight;
+
+    setInterval(() => {
+      const particleCount = 3;
+
+      // Get current scroll position
+      const scrollTop = window.scrollY;
+      const scrollRatio = scrollTop / (documentHeight - viewportHeight);
+
+      // Create drops at the top of the current viewport
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: {
+          x: randomInRange(0.1, 0.9),
+          y: scrollRatio * heightRatio, // Adjust origin based on scroll position
+        },
+        gravity: 3,
+        drift: randomInRange(-0.2, 0.2),
+        colors: ["#60a5fa", "#3b82f6", "#2563eb"], // Blue water colors
+        shapes: [waterDropShape],
+        scalar: randomInRange(0.3, 0.6),
+        ticks: 150,
+      });
+    }, 30);
+  };
+
+  // Modified Scroll Handler
+  const handleScroll = () => {
+    const isAtBottom =
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+
+    // Only handle visibility changes if we haven't reached bottom before
+    if (isAtBottom && !hasReachedBottom) {
+      hasReachedBottom = true; // Mark that we've reached bottom
+      elements.scrollMessage.classList.remove("visible");
+      elements.loveCarousel.classList.add("visible");
+      elements.loveReplyAnimation.classList.add("visible");
+      startCarousel();
+      // Set isHidden to false when carousel is shown
+      isHidden.set(false);
+
+      // Create appropriate effect based on answer
+      const theAnswer = elements.contentContainer.getAttribute("data-answer");
+      if (theAnswer === "1") {
+        createLoveShower();
+      } else {
+        createRainfall();
+      }
+    }
+
+    const scrollPosition = window.scrollY + window.innerHeight;
+    const viewportHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollPercentage = (window.scrollY / (documentHeight - viewportHeight)) * 100;
+
+    // Show SO name when scroll is around 33% of the total scrollable height
+    if (scrollPercentage >= 33) {
+      elements.senderName.classList.add("visible");
+      elements.senderName.style.opacity = "1";
+    }
+
+    // Update other animations based on scroll position
+    if (scrollPosition > elements.soName.offsetTop) {
+      elements.soName.classList.add("visible");
+    }
+  };
+
+  // Event Handlers
+  const handleEnvelopeClick = async () => {
+    elements.envelope.classList.add("opened");
+    elements.openText.classList.add("hide");
+
+    setTimeout(() => {
+      elements.envelope.classList.add("hide");
+      setTimeout(() => {
+        // Show Content Container
+        elements.contentContainer.classList.add("show");
+
+        document.body.style.overflow = "auto";
+
+        setTimeout(() => {
+          // Show Content Container
+          elements.contentContainer.classList.add("visible");
+          // Show Sticky Container
+          // elements.stickyContainer.classList.add("visible");
+          // Show Scroll Message
+          elements.scrollMessage.classList.add("visible");
+        }, 100);
+      }, 600);
+    }, 1200);
+  };
+
+  // Initialize
+  document.addEventListener("DOMContentLoaded", function () {
+    elements.envelope.addEventListener("click", handleEnvelopeClick);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Single observer for content container
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if ((mutation.target as HTMLElement).classList.contains("visible")) {
+          // Remove the observer since we only need it once
+          observer.disconnect();
+
+          // Instead of starting carousel immediately, we'll wait for scroll
+          // The handleScroll function will handle starting the carousel
+          // when the user scrolls to the bottom
+        }
+      });
+    });
+
+    observer.observe(elements.contentContainer, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  });
+</script>
+
+<div class="envelope">
+  <div class="envelope-body">
+    <div class="envelope-side-flap-left"></div>
+    <div class="envelope-side-flap-right"></div>
+  </div>
+  <div class="envelope-inner"></div>
+  <div class="envelope-flap"></div>
+</div>
+
+<div class="open-text font-primary">
+  Hey <b class="text-3xl">{name}</b>, let's open this reply letter ↑
+</div>
+
+<div class="scroll-message font-primary">Scroll down ↓</div>
+
+<div class="content-container md:w-1/2 w-full" data-answer={theAnswer}>
+  <div class="h-[300vh] relative scroll-smooth sticky-container">
+    <div class="sticky top-0 h-screen flex items-center justify-center">
+      <div class="w-full text-center p-10">
+        <!-- Sender's Name -->
+        <p
+          class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold visible"
+        >
+          Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{name}</b> ♥
+        </p>
+
+        <!-- SO's Name -->
+        <p class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0">
+          <b class="font-primary text-3xl md:text-5xl mr-1">{soName}</b>&nbsp;is replying your mail
+          with ...
+        </p>
+
+        <!-- YES_NO Reply message -->
+        <div class="mt-8 mb-16" id="love-container">
+          <div class="love-reply-animation mb-4">
+            <img
+              src={theAnswer === "1" ? "/assets/images/accept.gif" : "/assets/images/reject.gif"}
+              alt="Animation Accept / Reject"
+              class="w-48 h-48 mx-auto"
+            />
+          </div>
+          <div class="love-carousel">
+            {
+              theAnswer === "1"
+                ? YES_REPLY_TO_SHOW.map((message) => (
+                    <div class="love-message-slide">
+                      <p class="text-2xl font-secondary text-primary-accent">{message.say}</p>
+                      <p class="text-primary-accent">
+                        {message.pronounciation ? `(${message.pronounciation})` : null}
+                      </p>
+                      <p class="love-language">{message.origin_language}</p>
+                    </div>
+                  ))
+                : NO_REPLY_TO_SHOW.map((message) => (
+                    <div class="love-message-slide" data-reply-type="no">
+                      <p class="text-2xl font-secondary text-primary-accent">{message.say}</p>
+                      <p class="text-primary-accent">
+                        {message.pronounciation ? `(${message.pronounciation})` : null}
+                      </p>
+                      <p class="love-language">{message.origin_language}</p>
+                    </div>
+                  ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

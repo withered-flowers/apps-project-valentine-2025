@@ -1,0 +1,23 @@
+---
+import { GITHUB_REPO_URL } from "@/constant";
+import { Icon } from "astro-icon/components";
+---
+
+<nav class="w-full h-16 bg-primary-accent flex items-center justify-between p-4">
+  <a
+    href="/"
+    class="font-secondary text-xl text-white hover:text-tertiary-accent transition-all duration-300"
+    >Project Valentine</a
+  >
+  <ul>
+    <li class="font-secondary text-lg">
+      <a
+        href={GITHUB_REPO_URL}
+        class="flex flex-row gap-1 items-center justify-center underline hover:text-tertiary-accent text-white transition-colors duration-300"
+      >
+        <Icon name="mdi:github" class="github w-6 h-6" />
+        <span class="github">Github</span>
+      </a>
+    </li>
+  </ul>
+</nav>

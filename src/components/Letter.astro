@@ -1,0 +1,611 @@
+---
+import { MESSAGE_TO_SHOW } from "@/constant";
+
+import { DUMMY_RECEIVER, DUMMY_SENDER } from "@/constant.ts";
+
+const { id } = Astro.params;
+const { name, soName, isAnswered } = Astro.props;
+---
+
+<style>
+  /* Base Animations */
+  @keyframes spring {
+    0% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.1);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+    75% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-20px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
+
+  /* Fade In Effects */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition:
+      opacity 0.5s ease-out,
+      transform 0.5s ease-out;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Animation Classes */
+  .so-name.visible,
+  .sender-name.visible {
+    animation: spring 2s ease-in-out forwards;
+  }
+
+  .love-message.visible {
+    animation: spring 2s ease-in-out infinite;
+  }
+
+  /* Envelope Styles */
+  .envelope {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    background: #ffe4e6;
+    border: 2px solid #ffd1d6;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    perspective: 1000px;
+  }
+
+  .envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-top: 100px solid #ffd1d6;
+    transform-origin: top;
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
+
+  .envelope-letter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: white;
+    transform-origin: center;
+    transition: transform 0.8s ease;
+    z-index: 2;
+  }
+
+  .envelope::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: height 0.3s ease;
+  }
+
+  /* Envelope States */
+  .envelope.opened .envelope-flap {
+    transform: rotateX(180deg);
+  }
+
+  .envelope.opened .envelope-letter {
+    transform: translateY(-120%);
+  }
+
+  .envelope:hover {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  .envelope:hover::after {
+    height: 10px;
+  }
+
+  .envelope.hide {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+    transition:
+      transform 0.8s ease,
+      opacity 0.6s ease;
+  }
+
+  /* Content Container Styles */
+  .content-container {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    min-height: 100vh;
+  }
+
+  .content-container.show {
+    display: block;
+    opacity: 0;
+  }
+
+  .content-container.show.visible {
+    opacity: 1;
+  }
+
+  /* Sticky Container */
+  .sticky-container {
+    visibility: hidden;
+  }
+
+  .sticky-container.visible {
+    visibility: visible;
+  }
+
+  /* Scroll Message */
+  .scroll-message {
+    position: fixed;
+    bottom: 10rem;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: #fb7185;
+    font-size: 1.2rem;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-message.visible {
+    opacity: 1;
+  }
+
+  /* Love Carousel */
+  .love-carousel {
+    position: relative;
+    overflow: hidden;
+    height: 8rem;
+  }
+
+  .love-message-slide {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+  }
+
+  .love-message-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .love-message-slide.previous {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  .love-language {
+    font-size: 0.875rem;
+    color: #fb7185;
+    font-style: italic;
+  }
+
+  /* Choice Buttons */
+  .choice-buttons {
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+    gap: 1rem;
+  }
+
+  .choice-buttons.visible {
+    opacity: 1;
+    transition: opacity 3s ease-out;
+  }
+
+  /* Add new animation for form submission */
+  @keyframes fadeOutUp {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .choice-form.animating-out {
+    animation: fadeOutUp 0.5s ease forwards;
+  }
+
+  .choice-statement.animating-in {
+    animation: fadeInUp 0.5s ease forwards;
+  }
+
+  .choice-button {
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 4rem;
+    width: 10rem;
+  }
+
+  .yes-button {
+    background-color: #fb7185;
+    color: white;
+  }
+
+  .yes-button:hover {
+    background-color: #f43f5e;
+    transform: scale(1.05);
+  }
+
+  .maybe-button {
+    background-color: white;
+    color: #fb7185;
+    border: 2px solid #fb7185;
+  }
+
+  .maybe-button:hover {
+    background-color: #fff1f2;
+    transform: scale(1.05);
+  }
+
+  /* Open Text */
+  .open-text {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fb7185;
+    font-size: 1.2rem;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .open-text.hide {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  import { actions } from "astro:actions";
+  import confetti from "canvas-confetti";
+
+  // DOM Elements
+  const elements = {
+    envelope: document.querySelector(".envelope") as HTMLElement,
+    contentContainer: document.querySelector(".content-container") as HTMLElement,
+    stickyContainer: document.querySelector(".sticky-container") as HTMLElement,
+    scrollMessage: document.querySelector(".scroll-message") as HTMLElement,
+    openText: document.querySelector(".open-text") as HTMLElement,
+    soName: document.querySelector(".so-name") as HTMLElement,
+    loveMessage: document.querySelector(".love-message") as HTMLElement,
+    senderName: document.querySelector(".sender-name") as HTMLElement,
+    choiceButtons: document.querySelector(".choice-buttons") as HTMLElement,
+    audio: document.getElementById("audio-source") as HTMLAudioElement,
+    volumeOff: document.getElementById("volume-off"),
+    volumeOn: document.getElementById("volume-on"),
+    formMaybe: document.getElementById("form-maybe"),
+    formYes: document.getElementById("form-yes"),
+    loveContainer: document.getElementById("love-container"),
+    choiceForm: document.getElementsByClassName("choice-form"),
+    choiceStatement: document.getElementsByClassName("choice-statement"),
+  };
+
+  // Utility Functions
+  const createLoveShower = () => {
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 150,
+      zIndex: 0,
+    };
+
+    const loveShape = confetti.shapeFromPath({
+      path: `m12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5C2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53z`,
+    });
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Create an infinite interval
+    setInterval(function () {
+      const particleCount = 10;
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+        colors: ["#ff0000", "#ff69b4", "#ff1493", "#ff007f"],
+        shapes: [loveShape],
+      });
+    }, 250);
+  };
+
+  // Carousel Functions
+  const startCarousel = () => {
+    const slides = document.querySelectorAll(".love-message-slide");
+    let currentSlide = 0;
+
+    slides[0].classList.add("active");
+
+    setInterval(() => {
+      slides[currentSlide].classList.remove("active");
+      slides[currentSlide].classList.add("previous");
+
+      currentSlide = (currentSlide + 1) % slides.length;
+
+      slides[currentSlide].classList.remove("previous");
+      slides[currentSlide].classList.add("active");
+
+      setTimeout(() => {
+        slides.forEach((slide, index) => {
+          if (index !== currentSlide) {
+            slide.classList.remove("previous");
+          }
+        });
+      }, 500);
+    }, 3000);
+  };
+
+  // Scroll Handler
+  let hasReachedBottom = false;
+
+  const handleScroll = () => {
+    const isAtBottom =
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+
+    if (isAtBottom) {
+      elements.scrollMessage.classList.remove("visible");
+    }
+
+    const scrollPosition = window.scrollY + window.innerHeight;
+    const currentScrollTop = window.scrollY;
+
+    if (scrollPosition > elements.soName.offsetTop) {
+      elements.soName.classList.add("visible");
+    }
+    if (scrollPosition > document.body.scrollHeight / 2) {
+      elements.senderName.classList.add("visible");
+    }
+    if (scrollPosition > document.body.scrollHeight - elements.loveMessage.offsetHeight) {
+      if (!hasReachedBottom) {
+        createLoveShower();
+        hasReachedBottom = true;
+      }
+      elements.loveMessage.classList.add("visible");
+      elements.choiceButtons?.classList.add("visible");
+    }
+  };
+
+  // Initialize Function
+  const initQuestionOrAnswer = () => {
+    const isAnsweredYet = elements.contentContainer.getAttribute("data-is-answered");
+
+    if (isAnsweredYet !== "true") {
+      elements.choiceForm.item(0)?.classList.remove("hidden");
+      elements.choiceForm.item(1)?.classList.remove("hidden");
+      elements.choiceStatement.item(0)?.classList.add("hidden");
+      elements.choiceStatement.item(1)?.classList.add("hidden");
+    } else {
+      elements.choiceForm.item(0)?.classList.add("hidden");
+      elements.choiceForm.item(1)?.classList.add("hidden");
+      elements.choiceStatement.item(0)?.classList.remove("hidden");
+      elements.choiceStatement.item(1)?.classList.remove("hidden");
+    }
+  };
+
+  // Event Handlers
+  const handleEnvelopeClick = async () => {
+    elements.envelope.classList.add("opened");
+    elements.openText.classList.add("hide");
+
+    try {
+      await elements.audio.play();
+      elements.volumeOff?.classList.add("hidden");
+      elements.volumeOn?.classList.remove("hidden");
+    } catch (error) {
+      console.log("Audio playback failed:", error);
+    }
+
+    setTimeout(() => {
+      elements.envelope.classList.add("hide");
+      setTimeout(() => {
+        elements.contentContainer.classList.add("show");
+        document.body.style.overflow = "auto";
+        setTimeout(() => {
+          elements.contentContainer.classList.add("visible");
+          elements.stickyContainer.classList.add("visible");
+          elements.scrollMessage.classList.add("visible");
+        }, 100);
+      }, 600);
+    }, 1200);
+  };
+
+  const handleFormSubmit = async (theAnswer: boolean) => {
+    const slug = elements.contentContainer.getAttribute("data-slug") ?? "demo";
+
+    // Add animation before form submission
+    elements.choiceForm.item(0)?.classList.add("animating-out");
+    elements.choiceForm.item(1)?.classList.add("animating-out");
+
+    // Wait for animation to complete
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    if (slug !== "demo" && slug.length > 0) {
+      const { data, error } = await actions.formAcceptanceHandler({
+        slug,
+        the_answer: theAnswer,
+      });
+
+      if (!error) {
+        elements.contentContainer.setAttribute("data-is-answered", String(data.result));
+
+        elements.choiceForm.item(0)?.classList.add("hidden");
+        elements.choiceForm.item(1)?.classList.add("hidden");
+        elements.choiceStatement.item(0)?.classList.remove("hidden");
+        elements.choiceStatement.item(1)?.classList.remove("hidden");
+        elements.choiceStatement.item(0)?.classList.add("animating-in");
+        elements.choiceStatement.item(1)?.classList.add("animating-in");
+      }
+
+      return;
+    }
+  };
+
+  // Initialize
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initial setup
+    document.body.style.overflow = "hidden";
+    initQuestionOrAnswer();
+
+    // Event listeners
+    elements.envelope.addEventListener("click", handleEnvelopeClick);
+    elements.formYes?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      handleFormSubmit(true);
+    });
+    elements.formMaybe?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      handleFormSubmit(false);
+    });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Start carousel when content becomes visible
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if ((mutation.target as HTMLElement).classList.contains("visible")) {
+          startCarousel();
+          observer.disconnect();
+        }
+      });
+    });
+
+    observer.observe(elements.contentContainer, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  });
+</script>
+
+<div class="envelope">
+  <div class="envelope-body">
+    <div class="envelope-side-flap-left"></div>
+    <div class="envelope-side-flap-right"></div>
+  </div>
+  <div class="envelope-inner"></div>
+  <div class="envelope-flap"></div>
+</div>
+
+<div class="open-text font-primary">
+  Hey <b class="text-3xl">{soName}</b>, open this ↑
+</div>
+
+<div class="scroll-message font-primary">Scroll down ↓</div>
+
+<div class="content-container md:w-1/2 w-full" data-slug={id} data-is-answered={isAnswered}>
+  <div class="h-[300vh] relative scroll-smooth sticky-container">
+    <div class="sticky top-0 h-screen flex items-center justify-center">
+      <div class="w-full text-center p-10">
+        <!-- SO's Name -->
+        <p
+          class="text-2xl md:text-4xl font-secondary text-primary-accent fade-in so-name font-bold visible"
+          data-name={soName}
+        >
+          Hello, ♥ <b class="font-primary text-3xl md:text-5xl">{soName}</b> ♥
+        </p>
+
+        <!-- Sender's Name -->
+        <p
+          class="mt-16 text-lg font-secondary text-primary-accent fade-in sender-name opacity-0"
+          data-name={name}
+        >
+          <b class="font-primary text-3xl md:text-5xl mr-1">{name}</b> just wanna ask ...
+        </p>
+
+        <!-- I Love You message -->
+        <div class="my-16" id="love-container">
+          <div class="love-carousel fade-in love-message">
+            {
+              MESSAGE_TO_SHOW.map((message) => (
+                <div class="love-message-slide">
+                  <p class="text-2xl font-secondary text-primary-accent">{message.say}</p>
+                  <p class="text-primary-accent">
+                    {message.pronounciation ? `(${message.pronounciation})` : null}
+                  </p>
+                  <p class="love-language">{message.origin_language}</p>
+                </div>
+              ))
+            }
+          </div>
+
+          <div class="choice-buttons">
+            <form class="choice-form" method="post" id="form-yes">
+              <button class="choice-button yes-button">Yes</button>
+            </form>
+            <form class="choice-form" method="post" id="form-maybe">
+              <button class="choice-button maybe-button">Maybe</button>
+            </form>
+            <div class="flex flex-col gap-2">
+              <p class="choice-statement font-tertiary text-xl text-primary-accent">
+                ~ Thanks for answering the questions ~
+              </p>
+              <p class="choice-statement font-secondary text-base text-primary-accent">
+                Here&apos;s {soName}&apos;s reply ♥<br />
+                <a
+                  class="underline font-bold font-tertiary text-secondary-accent text-2xl hover:text-primary-accent transition-colors duration-300"
+                  href={name !== DUMMY_SENDER && soName !== DUMMY_RECEIVER
+                    ? `/letters/${id}/reply`
+                    : `/letters/demo/reply`}>{soName}&apos;s Reply Letter</a
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
